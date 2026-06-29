@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>FORTE: Full-Cycle Office Real-World Task Evaluation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="FORTE — a general agent benchmark on daily office productivity across 15 corporate professions, scored by an LLM-based rubric grading.">
+  <style>
+    /* No external CDN. Everything inline. */
+    :root {
+      --bg: #fafaf7;
+      --panel: #ffffff;
+      --fg: #1c1c1c;
+      --muted: #6b6b6b;
+      --accent: #d97757;
+      --accent-fg: #ffffff;
+      --border: #e6e3dc;
+      --soft: #f3f0e9;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                   "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.55;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code {
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.92em;
+      background: var(--soft);
+      padding: 1px 6px;
+      border-radius: 3px;
+    }
+
+    /* ---------- Top nav ---------- */
+    nav.top {
+      border-bottom: 1px solid var(--border);
+      background: var(--panel);
+    }
+    nav.top .inner {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      font-size: 14px;
+    }
+    nav.top .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      color: var(--fg);
+    }
+    nav.top .brand img { height: 28px; width: auto; display: block; }
+    nav.top .spacer { flex: 1; }
+    nav.top a.navlink { color: var(--muted); }
+    nav.top a.navlink:hover { color: var(--fg); text-decoration: none; }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 56px 24px 12px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+      text-align: center;
+    }
+    .hero img.logo {
+      width: 240px;
+      height: auto;
+      margin: 0 auto;
+    }
+    .hero h1 {
+      margin: 0;
+      font-size: 40px;
+      font-weight: 700;
+      letter-spacing: -0.015em;
+    }
+    .hero .tagline {
+      color: var(--muted);
+      font-size: 17px;
+      margin: 0;
+      max-width: 760px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .cta {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 7px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--fg);
+      font-size: 14px;
+      font-weight: 500;
+      transition: border-color 120ms, color 120ms;
+    }
+    .btn:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
+    .btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--accent-fg);
+    }
+    .btn.primary:hover { color: var(--accent-fg); opacity: 0.92; }
+    .btn .icon { font-size: 16px; line-height: 1; }
+
+    /* ---------- Sections ---------- */
+    main {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 24px 24px 64px;
+    }
+    section { margin-top: 28px; }
+    section h2 {
+      font-size: 22px;
+      font-weight: 700;
+      margin: 0 0 4px;
+      letter-spacing: -0.005em;
+    }
+    section .sub {
+      color: var(--muted);
+      font-size: 14px;
+      margin: 0 0 18px;
+    }
+
+    /* Feature grid */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+    .feature {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 18px;
+    }
+    .feature h3 {
+      margin: 0 0 6px;
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .feature p { margin: 0; font-size: 14px; color: var(--muted); }
+
+    /* Leaderboard */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      font-size: 14px;
+    }
+    th, td {
+      text-align: left;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      background: var(--soft);
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.04em;
+    }
+    tbody tr {
+      transition: background-color 120ms;
+    }
+    tbody tr:hover { background: var(--soft); }
+    tr:last-child td { border-bottom: none; }
+    td.model {
+      font-weight: 600;
+      letter-spacing: -0.005em;
+      width: 180px;
+      white-space: nowrap;
+    }
+    td.score {
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+      width: 100px;
+      white-space: nowrap;
+      font-size: 15px;
+    }
+    th:nth-child(4),
+    td:nth-child(4) {
+      padding-left: 48px;
+    }
+    td.score.placeholder {
+      color: var(--muted);
+      font-weight: normal;
+      font-style: italic;
+    }
+    td.rank {
+      width: 60px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+    .rank-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      background: var(--soft);
+      color: var(--muted);
+    }
+    .rank-badge.top1 { background: #fff3d1; color: #8a6500; box-shadow: inset 0 0 0 1px #f1d27c; }
+    .rank-badge.top2 { background: #ececec; color: #5a5a5a; box-shadow: inset 0 0 0 1px #cfcfcf; }
+    .rank-badge.top3 { background: #f7e0cd; color: #7a4a1d; box-shadow: inset 0 0 0 1px #e3b88f; }
+    tbody tr.top1 { background: #fffaee; }
+    tbody tr.top1:hover { background: #fff5dc; }
+    tbody tr.top2 { background: #f7f7f7; }
+    tbody tr.top2:hover { background: #efefef; }
+    tbody tr.top3 { background: #fbf1e8; }
+    tbody tr.top3:hover { background: #f6e6d6; }
+
+    /* Avg@3 primary metric with progress bar */
+    td.score.primary {
+      width: 1%;
+      white-space: nowrap;
+    }
+    .bar-cell {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .bar-track {
+      width: 320px;
+      height: 9px;
+      background: var(--soft);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #e6936a 0%, var(--accent) 100%);
+      border-radius: 999px;
+      transition: width 360ms ease;
+    }
+    tr.top1 .bar-fill {
+      background: linear-gradient(90deg, #c45a36 0%, #d97757 100%);
+    }
+    .bar-cell .bar-value {
+      min-width: 62px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    /* Quickstart */
+    pre.code {
+      background: #1f1d1a;
+      color: #f5f1e8;
+      border-radius: 10px;
+      padding: 16px 18px;
+      overflow-x: auto;
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      margin: 0;
+    }
+    pre.code .c { color: #8a8175; }
+
+    /* Footer */
+    footer {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 32px 24px 48px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: space-between;
+    }
+
+    @media (max-width: 560px) {
+      .hero { padding-top: 36px; }
+      .hero h1 { font-size: 30px; }
+      .hero img.logo { width: 180px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="top">
+  <div class="inner">
+    <a class="brand" href="#top">
+      <img src="figs/logo.png" alt="">
+      <span>FORTE</span>
+    </a>
+    <span class="spacer"></span>
+    <a class="navlink" href="#leaderboard">Leaderboard</a>
+    <a class="navlink" href="#quickstart">Quickstart</a>
+    <a class="navlink" href="#resources">Resources</a>
+  </div>
+</nav>
+
+<header id="top" class="hero">
+  <img class="logo" src="figs/logo.png" alt="FORTE logo">
+  <h1>FORTE: Full-Cycle Office Real-World Task Evaluation</h1>
+  <p class="tagline">
+    A general agent benchmark on daily office productivity
+    across 15 corporate professions, including multi-modal office environments (xlsx / docx / pptx / pdf / csv / images / source files).
+  </p>
+  <div class="cta">
+    <a class="btn primary" id="cta-github" href="https://github.com/AGI-Eval-Official/FORTE" target="_blank" rel="noopener">
+      <span class="icon">&#x25C9;</span> GitHub
+    </a>
+  </div>
+</header>
+
+<main>
+
+  <section id="features">
+    <h2>What's in the benchmark</h2>
+    <p class="sub">Built to be running on a single Docker image: agent + judge + LibreOffice + CJK fonts all live in one container.</p>
+    <div class="features">
+      <div class="feature">
+        <h3>Real Office Artifacts</h3>
+        <p>xlsx, docx, pptx, pdf, csv, images, source files.</p>
+      </div>
+      <div class="feature">
+        <h3>15 Corporate Professions</h3>
+        <p>Marketing, Sales, BA, Operations, Dev, SRE, HR, Finance, PM, Legal, Algorithm, QA, UI/UX, Administration, and General.</p>
+      </div>
+      <div class="feature">
+        <h3>LLM-Based Rubric Grading</h3>
+        <p>Output artifacts are checked against expert-annotated rubrics by an LLM judge.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="leaderboard">
+    <h2>Leaderboard</h2>
+    <p class="sub">All models are evaluated with thinking mode enabled. For models that expose a configurable reasoning effort / thinking level, the highest setting is used.</p>
+    <table>
+      <thead>
+        <tr>
+          <th class="rank">#</th>
+          <th>Model</th>
+          <th>Avg@3</th>
+          <th>Pass@3</th>
+          <th>Pass^3</th>
+        </tr>
+      </thead>
+      <tbody id="lb-body">
+        <tr><td colspan="5">loading&hellip;</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="quickstart">
+    <h2>Quickstart</h2>
+    <p class="sub">A full run is <em>three</em> commands once your gateway is configured.</p>
+<pre class="code"><span class="c"># 1. Configure an OpenAI-compatible gateway (used for both agent and judge).</span>
+cp openclaw_config/openclaw.json.example openclaw_config/openclaw.json
+cp openclaw_config/.env.example          openclaw_config/.env
+
+<span class="c"># 2. Build the single agent+judge Docker image.</span>
+bash docker/fetch-lo.sh
+docker build -f docker/Dockerfile.agent -t forte-agent:latest docker/
+
+<span class="c"># 3. Run.</span>
+bash scripts/run.sh
+
+<span class="c"># Or run the benchmark CLI directly with an explicit model.</span>
+python scripts/benchmark.py \
+  --model your-gateway/claude-sonnet-4.6 \
+  --dataset ./data \
+  --runs 3 \
+  --concurrency 1 \
+  --output-dir ./results
+
+<span class="c"># Optional overrides.</span>
+MODEL=your-gateway/claude-sonnet-4.6 RUNS=3 CONCURRENCY=2 bash scripts/run.sh
+</pre>
+  </section>
+
+  <section id="resources">
+    <h2>Resources</h2>
+    <div class="features">
+      <div class="feature">
+        <h3><a id="r-github" href="https://github.com/AGI-Eval-Official/FORTE" target="_blank" rel="noopener">GitHub Repository &rarr;</a></h3>
+        <p>Task Definition, Source Code, Docker Recipe, Judge Implementation.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div>
+    Built on <a href="https://github.com/SKYLENAGE-AI/QwenClawBench">QwenClawBench</a>.
+    We also acknowledge other open-source contributions from the community, such as
+    <a href="https://github.com/pinchbench/skill">PinchBench</a>,
+    <a href="https://github.com/claw-eval/claw-eval">Claw-Eval</a>,
+    <a href="https://huggingface.co/datasets/zai-org/ZClawBench">ZClawBench</a>, and
+    <a href="https://github.com/InternLM/WildClawBench">WildClawBench</a>.
+    Licensed under the MIT License.
+  </div>
+  <div>
+    Xin Gao &lt;gaoxin60@meituan.com&gt; &middot;
+    Jiaxing Liu &lt;liujiaxing10@meituan.com&gt; &middot;
+    Mingyang Zhu &lt;zhumingyang09@meituan.com&gt; &middot;
+    Shengnan An &lt;anshengnan@meituan.com&gt; &middot;
+    Xiaoyu Li &lt;lixiaoyu28@meituan.com&gt; &middot;
+    Xuezhi Cao &lt;caoxuezhi@meituan.com&gt; &middot;
+    Yuhuai Wei &lt;weiyuhuai@meituan.com&gt; &middot;
+    Zhifeng Li &lt;lizhifeng05@meituan.com&gt; &middot;
+    Zijian Zhang &lt;zhangzijian14@meituan.com&gt; &middot;
+    Ziwen Wang &lt;wangziwen03@meituan.com&gt;
+  </div>
+</footer>
+
+<script>
+  // ---- Leaderboard ------------------------------------------------------
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    }[c]));
+  }
+
+  // Parse a value that may be a number, "70.4", "70.4%", or "xxx".
+  // Returns { display, pct } where pct is in [0, 100] or null if not numeric.
+  function parseMetric(v) {
+    if (v === null || v === undefined) return { display: "—", pct: null };
+    const s = String(v).trim();
+    if (s.toLowerCase() === "xxx" || s === "") return { display: "xxx", pct: null };
+    const m = s.match(/^(-?\d+(?:\.\d+)?)\s*%?$/);
+    if (!m) return { display: s, pct: null };
+    const n = parseFloat(m[1]);
+    if (isNaN(n)) return { display: s, pct: null };
+    // Heuristic: treat values <= 1 as fractions (0.704 -> 70.4%)
+    const pct = n <= 1 && n >= 0 ? n * 100 : n;
+    const clamped = Math.max(0, Math.min(100, pct));
+    return { display: pct.toFixed(1) + "%", pct: clamped };
+  }
+
+  function fmtMetric(v) {
+    const { display } = parseMetric(v);
+    return display;
+  }
+
+  (async () => {
+    const tbody = document.getElementById("lb-body");
+    try {
+      const r = await fetch("leaderboard.json", { cache: "no-store" });
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      const data = await r.json();
+      // Stable sort by Avg@3 desc. On tie, preserve the JSON input order
+      // (whichever model appears earlier in leaderboard.json wins).
+      // Rows without a numeric Avg@3 sink to the bottom.
+      data.sort((a, b) => {
+        const av = parseMetric(a.avg_at_3).pct;
+        const bv = parseMetric(b.avg_at_3).pct;
+        if (av === null && bv === null) return 0;
+        if (av === null) return 1;
+        if (bv === null) return -1;
+        return bv - av;
+      });
+      tbody.innerHTML = "";
+      data.forEach((row, i) => {
+        const avg = parseMetric(row.avg_at_3);
+        const pass = parseMetric(row.pass_at_3);
+        const pow  = parseMetric(row.pass_pow_3);
+        const avgCell = avg.pct === null
+          ? '<td class="score primary placeholder">' + escapeHtml(avg.display) + '</td>'
+          : '<td class="score primary">'
+            + '<div class="bar-cell">'
+            +   '<div class="bar-track"><div class="bar-fill" style="width:' + avg.pct.toFixed(1) + '%"></div></div>'
+            +   '<span class="bar-value">' + escapeHtml(avg.display) + '</span>'
+            + '</div></td>';
+
+        const rank = i + 1;
+        const topClass = rank <= 3 ? ' top' + rank : '';
+        const badgeCell = '<td class="rank">'
+          + '<span class="rank-badge' + topClass + '">' + rank + '</span>'
+          + '</td>';
+
+        const tr = document.createElement("tr");
+        if (topClass) tr.className = 'top' + rank;
+        tr.innerHTML =
+          badgeCell +
+          '<td class="model">' + escapeHtml(row.model) + '</td>' +
+          avgCell +
+          '<td class="score' + (pass.pct === null ? ' placeholder' : '') + '">'
+            + escapeHtml(pass.display) + '</td>' +
+          '<td class="score' + (pow.pct === null ? ' placeholder' : '') + '">'
+            + escapeHtml(pow.display) + '</td>';
+        tbody.appendChild(tr);
+      });
+    } catch (e) {
+      tbody.innerHTML =
+        '<tr><td colspan="5">Could not load leaderboard.json: ' +
+        escapeHtml(e.message || String(e)) + '</td></tr>';
+    }
+  })();
+</script>
+
+</body>
+</html>

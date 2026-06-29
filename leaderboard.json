@@ -1,0 +1,22 @@
+[
+  {"model": "GLM 5.2",              "avg_at_3": "0.7687", "pass_at_3": "0.8525", "pass_pow_3": "0.6393"},
+  {"model": "GLM 5.1",              "avg_at_3": "0.7377", "pass_at_3": "0.8525", "pass_pow_3": "0.6120"},
+  {"model": "DeepSeek V4 pro",      "avg_at_3": "0.7049", "pass_at_3": "0.8306", "pass_pow_3": "0.5464"},
+  {"model": "GPT 5.5",              "avg_at_3": "0.7778", "pass_at_3": "0.8525", "pass_pow_3": "0.6885"},
+  {"model": "Claude Opus 4.7",      "avg_at_3": "0.7760", "pass_at_3": "0.8361", "pass_pow_3": "0.6885"},
+  {"model": "Gemini 3.1 Pro",       "avg_at_3": "0.7031", "pass_at_3": "0.8197", "pass_pow_3": "0.6011"},
+  {"model": "Claude Opus 4.8",      "avg_at_3": "0.7723", "pass_at_3": "0.8470", "pass_pow_3": "0.6995"},
+  {"model": "Claude Opus 4.6",      "avg_at_3": "0.7322", "pass_at_3": "0.8087", "pass_pow_3": "0.6339"},
+  {"model": "Claude Sonnet 4.6",    "avg_at_3": "0.6831", "pass_at_3": "0.7814", "pass_pow_3": "0.5683"},
+  {"model": "GPT 5.4",              "avg_at_3": "0.6885", "pass_at_3": "0.7923", "pass_pow_3": "0.5683"},
+  {"model": "GLM 5",                "avg_at_3": "0.6066", "pass_at_3": "0.7486", "pass_pow_3": "0.4426"},
+  {"model": "GLM 5 Turbo",          "avg_at_3": "0.6120", "pass_at_3": "0.7486", "pass_pow_3": "0.4208"},
+  {"model": "Kimi K2.5",            "avg_at_3": "0.5556", "pass_at_3": "0.6885", "pass_pow_3": "0.3825"},
+  {"model": "Kimi K2.6",            "avg_at_3": "0.6393", "pass_at_3": "0.8033", "pass_pow_3": "0.4645"},
+  {"model": "Minimax M3",           "avg_at_3": "0.7122", "pass_at_3": "0.8251", "pass_pow_3": "0.5628"},
+  {"model": "Minimax M2.7",         "avg_at_3": "0.4954", "pass_at_3": "0.6776", "pass_pow_3": "0.3224"},
+  {"model": "DeepSeek V4 Flash",    "avg_at_3": "0.7067", "pass_at_3": "0.8196", "pass_pow_3": "0.5628"},
+  {"model": "Qwen 3.6 Plus",        "avg_at_3": "0.6248", "pass_at_3": "0.7596", "pass_pow_3": "0.4590"},
+  {"model": "Doubao Seed 2.0 Pro",  "avg_at_3": "0.5774", "pass_at_3": "0.6995", "pass_pow_3": "0.4426"},
+  {"model": "HY3 Preview",          "avg_at_3": "0.4973", "pass_at_3": "0.6995", "pass_pow_3": "0.2896"}
+]
