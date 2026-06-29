@@ -1,0 +1,27 @@
+# Agent toolchain shipped in the image.
+#
+# This set is trimmed to what the 15 demo tasks actually need; agents are free
+# to `pip install` extra libs at runtime for tasks that require them.
+#
+# Already provided elsewhere: openpyxl/pillow/pypdf/requests (judge-requirements),
+# LibreOffice + poppler-utils + CJK fonts (Dockerfile.agent system layer).
+
+# --- data / spreadsheet (xlsx + csv tasks) ---
+pandas==2.2.3
+
+# --- office documents (docx read/write across HR/Legal/Marketing/Ops/PM/UIUX) ---
+python-docx==1.1.2
+lxml==5.3.0
+
+# --- pdf read (hr-001, administration-001) ---
+pdfplumber==0.11.4
+
+# --- http (ba-079 + dev-015 FastAPI TestClient) ---
+requests==2.32.5
+httpx==0.28.1
+
+# --- code-task scaffolding (dev-015 is a FastAPI app; agent writes pytest tests) ---
+fastapi==0.115.5
+pydantic==2.10.3
+sqlalchemy==2.0.36
+pytest==8.3.4

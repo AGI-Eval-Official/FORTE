@@ -1,0 +1,38 @@
+# secrets / configs with keys
+/openclaw_config/.env
+/openclaw_config/openclaw.json
+
+# internal-only docs (do not ship)
+/CLAUDE.md
+/task.md
+/task2.md
+
+# venvs / caches
+.venv/
+__pycache__/
+**/__pycache__/
+*.pyc
+
+# build / run artifacts (none should be committed)
+/results/
+results*/
+/logs/
+*.log
+/tmp/
+/analysis/
+
+# IDEs
+/.vscode/
+/.idea/
+/.claude/
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# LibreOffice tarballs pre-staged for the agent image build (large; fetched via docker/fetch-lo.sh)
+/docker/lo-pkgs/*.tar.gz
+!/docker/lo-pkgs/.keep
+
+# Third-party general-purpose skills installed by scripts/install-anthropic-skills.sh
+/data/extra_skills/

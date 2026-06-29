@@ -1,0 +1,232 @@
+====================================================================
+[系统告警元数据]
+告警ID: ES-PERF-010-QPS-SURGE-RESOURCE-BOTTLENECK
+发生时间: 2024-11-11T00:00:00Z（双十一大促零点开始）
+持续时间: 约 40 分钟（00:00 起持续告警，00:38 集群读写性能严重劣化）
+受影响资源: cluster: prod-order-es-cluster, indices: [order-2024-11, item-search-2024-11, user-activity-2024-11]
+告警指标:
+  - node.indices.search.query_qps: 峰值 4800/s（正常基线 600/s，激增 8 倍）
+  - node.indices.indexing.index_qps: 峰值 3200/s（正常基线 400/s，激增 8 倍）
+  - cpu.busy: 峰值 97%（阈值 80%，全部 8 个 data 节点均超阈值）
+  - disk.io.util/device=max: 峰值 99%（阈值 80%，SATA 磁盘 IO 打满）
+  - node.jvm.mem.heap_used_percent: 峰值 91%（阈值 80%）
+  - node.jvm.gc.collectors.young.collection_count.perMin: 峰值 48 次/min（阈值 20 次/min）
+  - node.jvm.gc.collectors.old.collection_count.perMin: 峰值 5 次/min（阈值 1 次/min）
+  - node.jvm.gc.collectors.old.collection_time_in_millis.perMin: 峰值 28000ms/min（阈值 20000ms/min）
+  - node.indices.search.query_time_in_millis.avg: 峰值 12400ms（正常 < 200ms）
+  - node.indices.indexing.index_time_in_millis.avg: 峰值 8800ms（正常 < 50ms）
+  - node.thread_pool.write.rejected.perMin: 峰值 2340/min
+  - node.thread_pool.search.rejected.perMin: 峰值 1860/min
+====================================================================
+
+[日志片段 1: 集群部署信息（运维平台 Eagle 截图文字化）]
+集群名称: prod-order-es-cluster
+集群版本: Elasticsearch 7.10.2
+节点总数: 10
+节点角色分布:
+  - es-node-01 (10.1.1.1): roles=[master]  机型=vm-sata-8c-16g   机房=DC1
+  - es-node-02 (10.1.1.2): roles=[master]  机型=vm-sata-8c-16g   机房=DC2
+  - es-node-03 (10.1.1.3): roles=[master]  机型=vm-sata-8c-16g   机房=DC3
+  - es-node-04 (10.1.1.4): roles=[data]    机型=vm-sata-16c-32g  机房=DC1
+  - es-node-05 (10.1.1.5): roles=[data]    机型=vm-sata-16c-32g  机房=DC1
+  - es-node-06 (10.1.1.6): roles=[data]    机型=vm-sata-16c-32g  机房=DC2
+  - es-node-07 (10.1.1.7): roles=[data]    机型=vm-sata-16c-32g  机房=DC2
+  - es-node-08 (10.1.1.8): roles=[data]    机型=vm-sata-16c-32g  机房=DC3
+  - es-node-09 (10.1.1.9): roles=[data]    机型=vm-sata-16c-32g  机房=DC3
+  - es-node-10 (10.1.1.10): roles=[data]   机型=vm-sata-16c-32g  机房=DC1
+  - es-node-11 (10.1.1.11): roles=[data]   机型=vm-sata-16c-32g  机房=DC2
+注意: master 与 data 节点已分离部署，共 3 master + 8 data 节点
+
+索引配置:
+  - order-2024-11:       主分片=8, 副本=1, 单分片大小约 38GB
+  - item-search-2024-11: 主分片=8, 副本=1, 单分片大小约 42GB
+  - user-activity-2024-11: 主分片=8, 副本=1, 单分片大小约 28GB
+
+[日志片段 2: es-node-01_server.log（截取自 2024-11-10T23:50:00 - 2024-11-11T00:15:00）]
+[2024-11-10T23:50:03,812][INFO ][o.e.c.s.MasterService    ] [es-node-01] elected-as-master ([3] nodes joined)[{es-node-01}{...}{...}{10.1.1.1}{10.1.1.1:9300}], term: 12, version: 4821, reason: master node changed
+[2024-11-10T23:58:44,231][WARN ][o.e.t.TransportService   ] [es-node-01] timeout waiting for [30s] on response from [es-node-04][10.1.1.4:9300]; retrying
+[2024-11-10T23:58:44,512][INFO ][o.e.t.TransportService   ] [es-node-01] received response from [es-node-04][10.1.1.4:9300] after retry; connection restored
+[2024-11-11T00:03:17,004][WARN ][o.e.t.TransportService   ] [es-node-01] timeout waiting for [30s] on response from [es-node-06][10.1.1.6:9300]; retrying
+[2024-11-11T00:03:17,389][INFO ][o.e.t.TransportService   ] [es-node-01] received response from [es-node-06][10.1.1.6:9300] after retry; connection restored
+[2024-11-11T00:08:55,771][WARN ][o.e.t.TransportService   ] [es-node-01] timeout waiting for [30s] on response from [es-node-08][10.1.1.8:9300]; retrying
+[2024-11-11T00:08:55,990][INFO ][o.e.t.TransportService   ] [es-node-01] received response from [es-node-08][10.1.1.8:9300] after retry; connection restored
+[2024-11-11T00:12:01,334][INFO ][o.e.l.LicenseService     ] [es-node-01] LICENSE [TRIAL] mode - license will expire in 14 days. Cluster functionality may be reduced after expiration. Please update your license.
+
+[日志片段 3: es-node-04_server.log（截取自 2024-11-10T23:55:00 - 2024-11-11T00:20:00）]
+[2024-11-10T23:55:12,441][INFO ][o.e.m.j.JvmGcMonitorService] [es-node-04] [gc][young][30021][3] duration [180ms], collections [2]/[5s], total [180ms]/[8s], memory [22gb]->[18gb]/[28gb], all_pools {[young] [2.8gb]->[0.3gb]/[3gb]}{[survivor] [300mb]->[280mb]/[400mb]}{[old] [19gb]->[17.4gb]/[24.5gb]}
+[2024-11-11T00:00:03,118][INFO ][o.e.m.j.JvmGcMonitorService] [es-node-04] [gc][young][30022][8] duration [420ms], collections [6]/[5s], total [420ms]/[12s], memory [26gb]->[21gb]/[28gb], all_pools {[young] [2.9gb]->[0.2gb]/[3gb]}{[survivor] [290mb]->[260mb]/[400mb]}{[old] [22.8gb]->[20.5gb]/[24.5gb]}
+[2024-11-11T00:02:44,881][WARN ][o.e.m.j.JvmGcMonitorService] [es-node-04] [gc][young][30023][12] duration [860ms], collections [10]/[5s], total [860ms]/[18s], memory [27.5gb]->[23gb]/[28gb], all_pools {[young] [2.7gb]->[0.2gb]/[3gb]}{[survivor] [270mb]->[250mb]/[400mb]}{[old] [24.5gb]->[22.5gb]/[24.5gb]}
+[2024-11-11T00:05:01,223][WARN ][o.e.m.j.JvmGcMonitorService] [es-node-04] [gc][old][30024][2] duration [3.4s], collections [1]/[60s], total [3.4s]/[10s], memory [27.8gb]->[25gb]/[28gb], all_pools {[young] [2.5gb]->[0.2gb]/[3gb]}{[survivor] [250mb]->[230mb]/[400mb]}{[old] [25.05gb]->[24.6gb]/[24.5gb]}
+[2024-11-11T00:06:15,334][WARN ][o.e.t.ThreadPool] [es-node-04] thread pool [write] queue capacity reached, rejecting task
+[2024-11-11T00:06:15,335][WARN ][o.e.t.ThreadPool] [es-node-04] thread pool [search] queue capacity reached, rejecting task
+[2024-11-11T00:08:22,001][WARN ][o.e.m.j.JvmGcMonitorService] [es-node-04] [gc][old][30025][3] duration [5.1s], collections [2]/[60s], total [5.1s]/[16s], memory [27.9gb]->[26.5gb]/[28gb], all_pools {[young] [2.2gb]->[0.2gb]/[3gb]}{[survivor] [220mb]->[200mb]/[400mb]}{[old] [25.5gb]->[26.1gb]/[24.5gb]}
+[2024-11-11T00:10:33,445][WARN ][o.e.i.s.SearchSlowLog] [es-node-04] [index][order-2024-11][3] took[12.4s], took_millis[12400], total_hits[1234567], types[], stats[], search_type[QUERY_THEN_FETCH], total_shards[16], source[{"query":{"bool":{"must":[{"term":{"user_id":"10086"}},{"range":{"create_time":{"gte":"2024-11-01","lte":"2024-11-11"}}}]}},"aggs":{"status_count":{"terms":{"field":"order_status"}}},"size":100,"from":0}]
+[2024-11-11T00:12:01,882][WARN ][o.e.i.s.IndexingSlowLog] [es-node-04] [index][order-2024-11][3] took[8.8s], took_millis[8800], type[_doc], id[order_20241111_00120001], routing[], source[...]]
+[2024-11-11T00:15:44,559][WARN ][o.e.m.j.JvmGcMonitorService] [es-node-04] [gc][old][30026][5] duration [7.2s], collections [3]/[60s], total [7.2s]/[22s], memory [27.95gb]->[27.2gb]/[28gb], all_pools {[young] [1.8gb]->[0.2gb]/[3gb]}{[survivor] [180mb]->[160mb]/[400mb]}{[old] [26gb]->[26.8gb]/[24.5gb]}
+
+[日志片段 4: es-node-06_server.log（截取自 2024-11-11T00:05:00 - 2024-11-11T00:25:00）]
+[2024-11-11T00:05:44,221][WARN ][o.e.m.j.JvmGcMonitorService] [es-node-06] [gc][young][30027][9] duration [780ms], collections [8]/[5s], total [780ms]/[16s], memory [27gb]->[22gb]/[28gb], all_pools {[young] [2.6gb]->[0.2gb]/[3gb]}{[survivor] [260mb]->[240mb]/[400mb]}{[old] [24.1gb]->[21.6gb]/[24.5gb]}
+[2024-11-11T00:07:12,003][WARN ][o.e.t.ThreadPool] [es-node-06] thread pool [write] queue capacity reached, rejecting task
+[2024-11-11T00:07:12,004][WARN ][o.e.t.ThreadPool] [es-node-06] thread pool [search] queue capacity reached, rejecting task
+[2024-11-11T00:09:01,882][WARN ][o.e.m.j.JvmGcMonitorService] [es-node-06] [gc][old][30028][4] duration [4.8s], collections [2]/[60s], total [4.8s]/[14s], memory [27.8gb]->[26gb]/[28gb], all_pools {[young] [2.3gb]->[0.2gb]/[3gb]}{[survivor] [230mb]->[210mb]/[400mb]}{[old] [25.3gb]->[25.6gb]/[24.5gb]}
+[2024-11-11T00:11:33,334][WARN ][o.e.i.s.SearchSlowLog] [es-node-06] [index][item-search-2024-11][1] took[9.8s], took_millis[9800], total_hits[892341], types[], stats[], search_type[QUERY_THEN_FETCH], total_shards[16], source[{"query":{"bool":{"must":[{"match":{"item_name":"手机"}},{"range":{"price":{"gte":1000,"lte":5000}}}]}},"aggs":{"brand_count":{"terms":{"field":"brand","size":100}},"price_range":{"range":{"field":"price","ranges":[{"to":2000},{"from":2000,"to":3000},{"from":3000}]}}},"size":20,"from":0}]
+[2024-11-11T00:14:22,445][WARN ][o.e.m.j.JvmGcMonitorService] [es-node-06] [gc][old][30029][6] duration [6.3s], collections [3]/[60s], total [6.3s]/[20s], memory [27.9gb]->[27gb]/[28gb], all_pools {[young] [2.0gb]->[0.2gb]/[3gb]}{[survivor] [200mb]->[180mb]/[400mb]}{[old] [25.7gb]->[26.6gb]/[24.5gb]}
+
+[日志片段 5: es-node-07_server.log（截取自 2024-11-11T00:00:00 - 2024-11-11T00:30:00）]
+[2024-11-11T00:01:22,114][INFO ][o.e.s.s.SnapshotShardsService] [es-node-07] snapshot [order-backup/snap_20241110_2300] shard [order-2024-11][2] failed to create snapshot, reason: [failed to obtain shard lock for [order-2024-11][2]: lock held by [index shard recovery]]
+[2024-11-11T00:01:22,115][WARN ][o.e.s.SnapshotsService  ] [es-node-07] [order-backup/snap_20241110_2300] failed to finalize snapshot; deleting snapshot to clean up
+org.elasticsearch.snapshots.SnapshotException: [order-backup/snap_20241110_2300] failed to finalize snapshot
+    at org.elasticsearch.snapshots.SnapshotsService.endSnapshot(SnapshotsService.java:1021)
+    at org.elasticsearch.snapshots.SnapshotsService.lambda$finalizeSnapshotEntry$15(SnapshotsService.java:892)
+[2024-11-11T00:01:23,002][INFO ][o.e.s.SnapshotsService  ] [es-node-07] [order-backup/snap_20241110_2300] snapshot deleted successfully (cleanup after failure)
+
+[日志片段 6: es-node-08_server.log（截取自 2024-11-11T00:10:00 - 2024-11-11T00:35:00）]
+[2024-11-11T00:10:55,221][WARN ][o.e.m.j.JvmGcMonitorService] [es-node-08] [gc][young][30030][11] duration [920ms], collections [9]/[5s], total [920ms]/[20s], memory [27.5gb]->[23gb]/[28gb], all_pools {[young] [2.4gb]->[0.2gb]/[3gb]}{[survivor] [240mb]->[220mb]/[400mb]}{[old] [24.9gb]->[22.6gb]/[24.5gb]}
+[2024-11-11T00:12:34,334][WARN ][o.e.t.ThreadPool] [es-node-08] thread pool [write] queue capacity reached, rejecting task
+[2024-11-11T00:12:34,335][WARN ][o.e.t.ThreadPool] [es-node-08] thread pool [search] queue capacity reached, rejecting task
+[2024-11-11T00:16:01,882][WARN ][o.e.m.j.JvmGcMonitorService] [es-node-08] [gc][old][30031][7] duration [8.1s], collections [4]/[60s], total [8.1s]/[26s], memory [27.95gb]->[27.5gb]/[28gb], all_pools {[young] [1.9gb]->[0.2gb]/[3gb]}{[survivor] [190mb]->[170mb]/[400mb]}{[old] [25.9gb]->[27.1gb]/[24.5gb]}
+[2024-11-11T00:20:12,003][WARN ][o.e.i.s.SearchSlowLog] [es-node-08] [index][user-activity-2024-11][5] took[14.2s], took_millis[14200], total_hits[3456789], types[], stats[], search_type[QUERY_THEN_FETCH], total_shards[16], source[{"query":{"bool":{"must":[{"term":{"user_id":"88888"}},{"range":{"activity_time":{"gte":"2024-11-01","lte":"2024-11-11"}}}]}},"aggs":{"action_type":{"terms":{"field":"action_type","size":50}},"hourly_trend":{"date_histogram":{"field":"activity_time","calendar_interval":"hour"}}},"size":200,"from":5000}]
+
+[日志片段 7: es-node-09_server.log（截取自 2024-11-11T00:05:00 - 2024-11-11T00:20:00）]
+[2024-11-11T00:06:44,882][WARN ][o.e.i.s.SearchSlowLog] [es-node-09] [index][user-activity-2024-11][3] took[11.1s], took_millis[11100], total_hits[2134221], types[], stats[], search_type[QUERY_THEN_FETCH], total_shards[16], source[{"query":{"bool":{"must":[{"term":{"user_id":"66666"}},{"range":{"activity_time":{"gte":"2024-11-01","lte":"2024-11-11"}}}]}},"aggs":{"hourly_trend":{"date_histogram":{"field":"activity_time","calendar_interval":"hour"}}},"size":100,"from":0}]
+[2024-11-11T00:09:13,441][WARN ][o.e.i.IndicesService    ] [es-node-09] [user-activity-2024-11][3] CircuitBreakingException: [parent] Data too large, data for [<agg [hourly_trend]>] would be [28.9gb/28gb], which is larger than the limit of [26.2gb/24.4gb]; this circuit breaker is now open
+[2024-11-11T00:09:13,442][INFO ][o.e.i.IndicesService    ] [es-node-09] [user-activity-2024-11][3] circuit breaker tripped for request, request rejected; circuit breaker will reset automatically
+[2024-11-11T00:09:15,003][INFO ][o.e.i.IndicesService    ] [es-node-09] [user-activity-2024-11][3] circuit breaker reset; resuming normal operation
+
+[日志片段 8: es-node-10_server.log（截取自 2024-11-11T00:15:00 - 2024-11-11T00:40:00）]
+[2024-11-11T00:17:33,112][WARN ][o.e.i.s.SearchSlowLog] [es-node-10] [index][item-search-2024-11][5] took[10.3s], took_millis[10300], total_hits[1023441], types[], stats[], search_type[QUERY_THEN_FETCH], total_shards[16], source[{"query":{"bool":{"must":[{"match":{"item_name":"电视"}},{"range":{"price":{"gte":2000,"lte":8000}}}]}},"aggs":{"brand_count":{"terms":{"field":"brand","size":100}},"price_range":{"range":{"field":"price","ranges":[{"to":3000},{"from":3000,"to":5000},{"from":5000}]}}},"size":20,"from":0}]
+[2024-11-11T00:22:08,334][ERROR][o.e.i.s.InternalEngine  ] [es-node-10] [item-search-2024-11][5] failed to obtain shard lock, retrying in 5s
+org.elasticsearch.env.ShardLockObtainFailedException: [item-search-2024-11][5]: obtain shard lock
+    at org.elasticsearch.env.NodeEnvironment.shardLock(NodeEnvironment.java:512)
+    at org.elasticsearch.index.IndexService.createShard(IndexService.java:388)
+[2024-11-11T00:22:13,891][INFO ][o.e.i.s.InternalEngine  ] [es-node-10] [item-search-2024-11][5] shard lock obtained successfully after retry
+
+[日志片段 9: 运维人员在 00:38 执行的 API 诊断结果]
+
+GET /_cat/health?v
+epoch      timestamp cluster                status node.total node.data shards pri relo init unassign pending_tasks max_task_wait_time active_shards_percent
+1731254280 00:38:00  prod-order-es-cluster  yellow 11         8         96   48    0     0    48       0             -                  50.0%
+
+GET /_cat/nodes?v&h=name,ip,cpu,heap.percent,disk.used_percent,disk.io.util,load_1m,master,node.role
+name          ip          cpu  heap.percent  disk.used_percent  disk.io.util  load_1m  master  node.role
+es-node-01    10.1.1.1      8            22               18.3          12.1     0.88    *       m
+es-node-02    10.1.1.2      6            20               17.8          10.4     0.72    -       m
+es-node-03    10.1.1.3      7            21               18.1          11.2     0.81    -       m
+es-node-04    10.1.1.4     97            91               55.2          99.1    14.22    -       d
+es-node-05    10.1.1.5     95            89               54.8          98.3    13.88    -       d
+es-node-06    10.1.1.6     96            90               56.1          99.4    14.55    -       d
+es-node-07    10.1.1.7     94            88               53.9          97.8    13.44    -       d
+es-node-08    10.1.1.8     97            91               55.7          99.2    14.33    -       d
+es-node-09    10.1.1.9     93            87               54.3          97.1    13.21    -       d
+es-node-10    10.1.1.10    96            90               55.5          98.9    14.11    -       d
+es-node-11    10.1.1.11    95            89               54.6          98.5    13.77    -       d
+
+GET /_cat/thread_pool/write,search?v&h=node_name,name,active,queue,rejected
+node_name    name    active  queue  rejected
+es-node-04   write       32   1000     72341
+es-node-04   search      16    500     48921
+es-node-05   write       32    998     68234
+es-node-05   search      16    497     45678
+es-node-06   write       32   1000     74512
+es-node-06   search      16    500     50234
+es-node-07   write       32    995     65891
+es-node-07   search      16    493     43210
+es-node-08   write       32   1000     76234
+es-node-08   search      16    500     51234
+es-node-09   write       32    992     63445
+es-node-09   search      16    490     41234
+es-node-10   write       32    999     71234
+es-node-10   search      16    498     47891
+es-node-11   write       32    997     69123
+es-node-11   search      16    496     46234
+
+GET /_cat/shards?v&h=index,shard,prirep,state,node&s=state
+index                      shard  prirep  state         node
+order-2024-11              0      p       STARTED       es-node-04
+order-2024-11              0      r       UNASSIGNED    (unassigned)
+order-2024-11              1      p       STARTED       es-node-05
+order-2024-11              1      r       UNASSIGNED    (unassigned)
+order-2024-11              2      p       STARTED       es-node-06
+order-2024-11              2      r       UNASSIGNED    (unassigned)
+order-2024-11              3      p       STARTED       es-node-07
+order-2024-11              3      r       UNASSIGNED    (unassigned)
+order-2024-11              4      p       STARTED       es-node-08
+order-2024-11              4      r       UNASSIGNED    (unassigned)
+order-2024-11              5      p       STARTED       es-node-09
+order-2024-11              5      r       UNASSIGNED    (unassigned)
+order-2024-11              6      p       STARTED       es-node-10
+order-2024-11              6      r       UNASSIGNED    (unassigned)
+order-2024-11              7      p       STARTED       es-node-11
+order-2024-11              7      r       UNASSIGNED    (unassigned)
+item-search-2024-11        0      p       STARTED       es-node-05
+item-search-2024-11        0      r       UNASSIGNED    (unassigned)
+item-search-2024-11        1      p       STARTED       es-node-06
+item-search-2024-11        1      r       UNASSIGNED    (unassigned)
+item-search-2024-11        2      p       STARTED       es-node-07
+item-search-2024-11        2      r       UNASSIGNED    (unassigned)
+item-search-2024-11        3      p       STARTED       es-node-08
+item-search-2024-11        3      r       UNASSIGNED    (unassigned)
+item-search-2024-11        4      p       STARTED       es-node-09
+item-search-2024-11        4      r       UNASSIGNED    (unassigned)
+item-search-2024-11        5      p       STARTED       es-node-10
+item-search-2024-11        5      r       UNASSIGNED    (unassigned)
+item-search-2024-11        6      p       STARTED       es-node-11
+item-search-2024-11        6      r       UNASSIGNED    (unassigned)
+item-search-2024-11        7      p       STARTED       es-node-04
+item-search-2024-11        7      r       UNASSIGNED    (unassigned)
+user-activity-2024-11      0      p       STARTED       es-node-06
+user-activity-2024-11      0      r       UNASSIGNED    (unassigned)
+user-activity-2024-11      1      p       STARTED       es-node-07
+user-activity-2024-11      1      r       UNASSIGNED    (unassigned)
+user-activity-2024-11      2      p       STARTED       es-node-08
+user-activity-2024-11      2      r       UNASSIGNED    (unassigned)
+user-activity-2024-11      3      p       STARTED       es-node-09
+user-activity-2024-11      3      r       UNASSIGNED    (unassigned)
+user-activity-2024-11      4      p       STARTED       es-node-10
+user-activity-2024-11      4      r       UNASSIGNED    (unassigned)
+user-activity-2024-11      5      p       STARTED       es-node-11
+user-activity-2024-11      5      r       UNASSIGNED    (unassigned)
+user-activity-2024-11      6      p       STARTED       es-node-04
+user-activity-2024-11      6      r       UNASSIGNED    (unassigned)
+user-activity-2024-11      7      p       STARTED       es-node-05
+user-activity-2024-11      7      r       UNASSIGNED    (unassigned)
+
+GET /_cluster/settings
+{
+  "persistent": {},
+  "transient": {}
+}
+
+GET /_nodes/stats/thread_pool?filter_path=nodes.*.name,nodes.*.thread_pool.write,nodes.*.thread_pool.search
+{
+  "nodes": {
+    "node-04-id": {
+      "name": "es-node-04",
+      "thread_pool": {
+        "write": {"threads": 32, "queue": 1000, "active": 32, "rejected": 72341, "largest": 32, "completed": 1823441},
+        "search": {"threads": 16, "queue": 500, "active": 16, "rejected": 48921, "largest": 16, "completed": 921234}
+      }
+    }
+  }
+}
+
+GET /_cluster/allocation/explain
+{
+  "index": "order-2024-11",
+  "shard": 0,
+  "primary": false
+}
+{
+  "index": "order-2024-11",
+  "shard": 0,
+  "primary": false,
+  "current_state": "unassigned",
+  "unassigned_info": {
+    "reason": "NODE_LEFT",
+    "at": "2024-11-11T00:05:00.000Z",
+    "details": "node_left[es-node-spare-01]",
+    "last_allocation_status": "no_attempt"
+  },
+  "can_allocate": "throttled",
+  "allocate_explanation": "cannot allocate because all found copies of the shard are on nodes with high disk usage (above 85% threshold), and the cluster is under high load; throttling allocation to protect cluster stability"
+}

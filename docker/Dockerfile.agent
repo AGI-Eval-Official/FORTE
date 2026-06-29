@@ -1,0 +1,100 @@
+# FORTE agent sandbox image
+# --------------------------------------
+# Base = the OpenClaw image referenced by lib_docker DEFAULT_IMAGE, extended
+# with LibreOffice 26.2.4 + zh-CN langpack + CJK fonts + poppler/ffmpeg so the
+# judge stage (and any in-container conversions) can turn .docx/.doc/.pptx/.ppt
+# -> PDF with correctly rendered Chinese.
+#
+# Build (context = this docker/ dir; no extra COPY needed):
+#   docker build -f docker/Dockerfile.agent -t forte-agent:latest docker/
+#
+# Multi-arch: LibreOffice 26.2.4 ships separate aarch64 and x86_64 deb tarballs.
+# TARGETARCH (buildkit) selects the native one -> native image on Apple Silicon
+# (arm64) and Linux/Intel (amd64), no QEMU.
+
+# Base = OpenClaw 2026.6.5
+ARG BASE_IMAGE=ghcr.io/openclaw/openclaw@sha256:037f49ba1595be9502fb345138d727cd0cfaecf1392cbe0cfe053fb4681386cd
+FROM ${BASE_IMAGE}
+
+ARG http_proxy
+ARG https_proxy
+ARG HTTP_PROXY
+ARG HTTPS_PROXY
+
+# TARGETARCH is auto-populated by BuildKit: "amd64" or "arm64".
+# Legacy docker builds may leave it empty; the LibreOffice install step falls
+# back to the native image architecture in that case.
+ARG TARGETARCH
+
+# LibreOffice install needs root; the openclaw base runs as `node` (uid 1000).
+USER 0
+
+# ---------- System deps: LibreOffice runtime deps + CJK fonts ----------
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        curl ca-certificates \
+        poppler-utils \
+        fonts-noto-cjk \
+        fonts-noto-cjk-extra \
+        libxinerama1 libdbus-glib-1-2 libcairo2 libcups2 libsm6 \
+        libxrandr2 libxkbcommon0 libgl1 libegl1 \
+    && rm -rf /var/lib/apt/lists/*
+
+# ---------- LibreOffice 26.2.4 ----------
+ARG LO_VERSION=26.2.4
+ARG LO_MIRROR=https://download.documentfoundation.org/libreoffice/stable
+
+# lo-pkgs/ may hold the aarch64 and/or x86_64 deb tarballs + zh-CN langpacks.
+# (A .keep placeholder guarantees the dir exists so COPY never fails.)
+COPY lo-pkgs/ /tmp/lo/
+
+RUN set -eux; \
+    TARGETARCH="${TARGETARCH:-$(dpkg --print-architecture)}"; \
+    case "${TARGETARCH}" in \
+        amd64)  LO_ARCH_TAG=x86-64;  LO_ARCH_DIR=x86_64 ;; \
+        arm64)  LO_ARCH_TAG=aarch64; LO_ARCH_DIR=aarch64 ;; \
+        *) echo "unsupported TARGETARCH=${TARGETARCH}" >&2; exit 1 ;; \
+    esac; \
+    MAIN_TAR="LibreOffice_${LO_VERSION}_Linux_${LO_ARCH_TAG}_deb.tar.gz"; \
+    LANG_TAR="LibreOffice_${LO_VERSION}_Linux_${LO_ARCH_TAG}_deb_langpack_zh-CN.tar.gz"; \
+    LO_BASE="${LO_MIRROR}/${LO_VERSION}/deb/${LO_ARCH_DIR}"; \
+    cd /tmp/lo; \
+    [ -f "${MAIN_TAR}" ] || curl -fSL --http1.1 --retry 8 --retry-delay 5 --retry-all-errors -C - -O "${LO_BASE}/${MAIN_TAR}"; \
+    [ -f "${LANG_TAR}" ] || curl -fSL --http1.1 --retry 8 --retry-delay 5 --retry-all-errors -C - -O "${LO_BASE}/${LANG_TAR}"; \
+    tar xzf "${MAIN_TAR}"; \
+    tar xzf "${LANG_TAR}"; \
+    dpkg -i LibreOffice_${LO_VERSION}*_Linux_*_deb/DEBS/*.deb; \
+    dpkg -i LibreOffice_${LO_VERSION}*_Linux_*_deb_langpack_zh-CN/DEBS/*.deb; \
+    cd / && rm -rf /tmp/lo; \
+    ln -sf /opt/libreoffice26.2/program/soffice /usr/local/bin/soffice; \
+    ln -sf /opt/libreoffice26.2/program/soffice /usr/local/bin/libreoffice; \
+    soffice --headless --version
+
+# ---------- Judge Python deps ----------
+COPY judge-requirements.txt /tmp/judge-requirements.txt
+RUN apt-get update && apt-get install -y --no-install-recommends python3-pip \
+    && pip3 install --no-cache-dir --break-system-packages -r /tmp/judge-requirements.txt \
+    && rm -rf /var/lib/apt/lists/* /tmp/judge-requirements.txt
+
+# ---------- Agent dev + skill toolchain ----------
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        python3-pip python3-venv python3-dev \
+        build-essential \
+        unzip zip file jq wget sudo \
+        libxml2-dev libxslt1-dev zlib1g-dev \
+    && ln -sf /usr/bin/python3 /usr/local/bin/python \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY agent-requirements.txt /tmp/agent-requirements.txt
+# --timeout/--retries: PyPI (files.pythonhosted.org) throttles the build network
+# to ~30KB/s and drops connections; the default 15s socket timeout aborts large
+# wheels (scipy/PyMuPDF). A long timeout + many retries lets the layer survive.
+RUN pip3 install --no-cache-dir --break-system-packages \
+        --timeout 300 --retries 20 \
+        -r /tmp/agent-requirements.txt \
+    && rm -f /tmp/agent-requirements.txt
+
+ENV NODE_PATH=/usr/local/lib/node_modules
+RUN npm install -g --no-fund --no-audit vitest
+
+# Drop back to the unprivileged user the openclaw base expects.
+USER node

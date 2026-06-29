@@ -1,0 +1,119 @@
+---
+id: qa-003
+name: qa-003
+category: qa
+grading_type: llm_judge
+timeout_seconds: 2400
+input_modality: text
+workspace_files:
+- source: input/dashboard-toolkit/vitest.config.js
+  dest: input/dashboard-toolkit/vitest.config.js
+- source: input/dashboard-toolkit/package.json
+  dest: input/dashboard-toolkit/package.json
+- source: input/dashboard-toolkit/src/constants/index.js
+  dest: input/dashboard-toolkit/src/constants/index.js
+- source: input/dashboard-toolkit/src/utils/statisticsEngine.js
+  dest: input/dashboard-toolkit/src/utils/statisticsEngine.js
+- source: input/dashboard-toolkit/src/utils/filterEngine.js
+  dest: input/dashboard-toolkit/src/utils/filterEngine.js
+- source: input/dashboard-toolkit/src/utils/exportHelper.js
+  dest: input/dashboard-toolkit/src/utils/exportHelper.js
+- source: input/dashboard-toolkit/src/utils/metricsCalculator.js
+  dest: input/dashboard-toolkit/src/utils/metricsCalculator.js
+- source: input/dashboard-toolkit/src/utils/chartHelper.js
+  dest: input/dashboard-toolkit/src/utils/chartHelper.js
+- source: input/dashboard-toolkit/src/utils/validatorUtils.js
+  dest: input/dashboard-toolkit/src/utils/validatorUtils.js
+- source: input/dashboard-toolkit/src/utils/dataTransformer.js
+  dest: input/dashboard-toolkit/src/utils/dataTransformer.js
+- source: input/dashboard-toolkit/src/utils/dateUtils.js
+  dest: input/dashboard-toolkit/src/utils/dateUtils.js
+- source: skills/fastapi-testclient-guide/SKILL.md
+  dest: skills/fastapi-testclient-guide/SKILL.md
+- source: skills/fastapi-testclient-guide/references/reference.md
+  dest: skills/fastapi-testclient-guide/references/reference.md
+- source: skills/test-refactoring/SKILL.md
+  dest: skills/test-refactoring/SKILL.md
+- source: skills/test-refactoring/references/reference.md
+  dest: skills/test-refactoring/references/reference.md
+- source: skills/unit-test-junit4-mockito/SKILL.md
+  dest: skills/unit-test-junit4-mockito/SKILL.md
+- source: skills/unit-test-junit4-mockito/references/reference.md
+  dest: skills/unit-test-junit4-mockito/references/reference.md
+- source: skills/ci-cd-test-report/SKILL.md
+  dest: skills/ci-cd-test-report/SKILL.md
+- source: skills/ci-cd-test-report/references/reference.md
+  dest: skills/ci-cd-test-report/references/reference.md
+- source: skills/go-testify-unit-test/SKILL.md
+  dest: skills/go-testify-unit-test/SKILL.md
+- source: skills/go-testify-unit-test/references/reference.md
+  dest: skills/go-testify-unit-test/references/reference.md
+- source: skills/bug-fix-regression-test/SKILL.md
+  dest: skills/bug-fix-regression-test/SKILL.md
+- source: skills/pytest-unit-testing/SKILL.md
+  dest: skills/pytest-unit-testing/SKILL.md
+- source: skills/pytest-unit-testing/references/reference.md
+  dest: skills/pytest-unit-testing/references/reference.md
+- source: skills/vitest-test-repair/SKILL.md
+  dest: skills/vitest-test-repair/SKILL.md
+- source: skills/vitest-test-repair/references/reference.md
+  dest: skills/vitest-test-repair/references/reference.md
+solution_files:
+- source: solution/rubrics.md
+  dest: solution/rubrics.md
+rubric_file_paths:
+- /workspace/input/dashboard-toolkit/tests/metricsCalculator.test.js
+- /workspace/input/dashboard-toolkit/tests/dataTransformer.test.js
+- /workspace/input/dashboard-toolkit/tests/filterEngine.test.js
+- /workspace/input/dashboard-toolkit/vitest.config.js
+- /workspace/input/dashboard-toolkit/src/utils/metricsCalculator.js
+- /workspace/input/dashboard-toolkit/src/utils/dataTransformer.js
+- /workspace/input/dashboard-toolkit/src/utils/filterEngine.js
+rubrics:
+- id: '01'
+  content: <file>/workspace/input/dashboard-toolkit/tests/metricsCalculator.test.js</file>、<file>/workspace/input/dashboard-toolkit/tests/dataTransformer.test.js</file>和<file>/workspace/input/dashboard-toolkit/tests/filterEngine.test.js</file>三个文件合计包含至少 8 个测试用例（`it(` 或 `test(` 出现至少 8 次）
+  weight: 1
+- id: '02'
+  content: <file>/workspace/input/dashboard-toolkit/tests/metricsCalculator.test.js</file>中导入 `metricsCalculator` ，<file>/workspace/input/dashboard-toolkit/tests/dataTransformer.test.js</file>中导入 `dataTransformer` ，<file>/workspace/input/dashboard-toolkit/tests/filterEngine.test.js</file>中导入 `filterEngine` 导入（测试覆盖了 3 个不同的 src/utils/ 模块）
+  weight: 1
+- id: '03'
+  content: <file>/workspace/input/dashboard-toolkit/vitest.config.js</file>文件中 resolve alias 路径已修正：`@` 别名指向 `./src` 而非 `./source`（文件中出现 `./src` 且不再包含 `./source`）
+  weight: 1
+- id: '04'
+  content: <file>/workspace/input/dashboard-toolkit/tests/metricsCalculator.test.js</file>、<file>/workspace/input/dashboard-toolkit/tests/dataTransformer.test.js</file>和<file>/workspace/input/dashboard-toolkit/tests/filterEngine.test.js</file>三个文件中，至少 2 个测试用例验证了边界条件或异常输入（如空数组、null、零值、无效日期等非正常路径场景）
+  weight: 1
+- id: '05'
+  content: <file>/workspace/input/dashboard-toolkit/tests/metricsCalculator.test.js</file>、<file>/workspace/input/dashboard-toolkit/tests/dataTransformer.test.js</file>和<file>/workspace/input/dashboard-toolkit/tests/filterEngine.test.js</file>三个文件中，使用了 `expect(` 搭配 `.toBe(`、`.toEqual(`、`.toStrictEqual(`、`.toContain(`、`.toHaveLength(` 中的至少 2 种不同断言方法
+  weight: 1
+- id: '06'
+  content: <file>/workspace/input/dashboard-toolkit/src/utils/metricsCalculator.js</file>文件中 `calculateGrowthRate` 函数的增长率公式除数已修正为 oldValue：函数体内出现 `/ oldValue` 而非 `/ newValue`
+  weight: 1
+- id: '07'
+  content: <file>/workspace/input/dashboard-toolkit/src/utils/dataTransformer.js</file>文件中 `sortByField` 函数不再原地修改入参数组：函数体内使用了展开运算符 `[...data]` 或 `.slice()` 创建副本后再 sort
+  weight: 1
+- id: '08'
+  content: <file>/workspace/input/dashboard-toolkit/src/utils/filterEngine.js</file>文件中 存在`filterByDateRange` 函数，且日期比较包含了相应的边界，以及日期边界允许开区间和闭区间的写法
+  weight: 1
+---
+
+## Prompt
+
+我有一个数据看板工具库项目（Vue 3 + Vitest），在 `/workspace/input/dashboard-toolkit/` 目录下。`/workspace/input/dashboard-toolkit/src/utils/` 下有若干工具模块，之前我自己试着写了几个测试跑了下，发现有不少问题，搞不定索性把测试删了。
+
+请帮我做两件事：
+1. 给 `/workspace/input/dashboard-toolkit/src/utils/` 下的主要工具模块写 Vitest 测试用例，至少覆盖 8 个测试场景，按模块拆分为 ：
+`/workspace/input/dashboard-toolkit/tests/metricsCalculator.test.js`、`/workspace/input/dashboard-toolkit/tests/dataTransformer.test.js`、`/workspace/input/dashboard-toolkit/tests/filterEngine.test.js`
+2. 跑一下测试，如果发现有失败的，排查源码和配置里的问题并修复，最终确保所有测试通过
+
+请直接在原始代码和配置文件上进行修复，过程中出现任何问题，不用问我，请直接搞定。
+
+## Grading Criteria
+
+- [ ] [01] <file>/workspace/input/dashboard-toolkit/tests/metricsCalculator.test.js</file>、<file>/workspace/input/dashboard-toolkit/tests/dataTransformer.test.js</file>和<file>/workspace/input/dashboard-toolkit/tests/filterEngine.test.js</file>三个文件合计包含至少 8 个测试用例（`it(` 或 `test(` 出现至少 8 次）
+- [ ] [02] <file>/workspace/input/dashboard-toolkit/tests/metricsCalculator.test.js</file>中导入 `metricsCalculator` ，<file>/workspace/input/dashboard-toolkit/tests/dataTransformer.test.js</file>中导入 `dataTransformer` ，<file>/workspace/input/dashboard-toolkit/tests/filterEngine.test.js</file>中导入 `filterEngine` 导入（测试覆盖了 3 个不同的 src/utils/ 模块）
+- [ ] [03] <file>/workspace/input/dashboard-toolkit/vitest.config.js</file>文件中 resolve alias 路径已修正：`@` 别名指向 `./src` 而非 `./source`（文件中出现 `./src` 且不再包含 `./source`）
+- [ ] [04] <file>/workspace/input/dashboard-toolkit/tests/metricsCalculator.test.js</file>、<file>/workspace/input/dashboard-toolkit/tests/dataTransformer.test.js</file>和<file>/workspace/input/dashboard-toolkit/tests/filterEngine.test.js</file>三个文件中，至少 2 个测试用例验证了边界条件或异常输入（如空数组、null、零值、无效日期等非正常路径场景）
+- [ ] [05] <file>/workspace/input/dashboard-toolkit/tests/metricsCalculator.test.js</file>、<file>/workspace/input/dashboard-toolkit/tests/dataTransformer.test.js</file>和<file>/workspace/input/dashboard-toolkit/tests/filterEngine.test.js</file>三个文件中，使用了 `expect(` 搭配 `.toBe(`、`.toEqual(`、`.toStrictEqual(`、`.toContain(`、`.toHaveLength(` 中的至少 2 种不同断言方法
+- [ ] [06] <file>/workspace/input/dashboard-toolkit/src/utils/metricsCalculator.js</file>文件中 `calculateGrowthRate` 函数的增长率公式除数已修正为 oldValue：函数体内出现 `/ oldValue` 而非 `/ newValue`
+- [ ] [07] <file>/workspace/input/dashboard-toolkit/src/utils/dataTransformer.js</file>文件中 `sortByField` 函数不再原地修改入参数组：函数体内使用了展开运算符 `[...data]` 或 `.slice()` 创建副本后再 sort
+- [ ] [08] <file>/workspace/input/dashboard-toolkit/src/utils/filterEngine.js</file>文件中 存在`filterByDateRange` 函数，且日期比较包含了相应的边界，以及日期边界允许开区间和闭区间的写法

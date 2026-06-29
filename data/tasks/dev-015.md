@@ -1,0 +1,178 @@
+---
+id: dev-015
+name: dev-015
+category: dev
+grading_type: llm_judge
+timeout_seconds: 2400
+input_modality: text
+workspace_files:
+- source: input/PRD.md
+  dest: input/PRD.md
+- source: input/technical-design.md
+  dest: input/technical-design.md
+- source: input/source-code/requirements.txt
+  dest: input/source-code/requirements.txt
+- source: input/source-code/start.sh
+  dest: input/source-code/start.sh
+- source: input/source-code/app/config.py
+  dest: input/source-code/app/config.py
+- source: input/source-code/app/database.py
+  dest: input/source-code/app/database.py
+- source: input/source-code/app/main.py
+  dest: input/source-code/app/main.py
+- source: input/source-code/app/routers/models.py
+  dest: input/source-code/app/routers/models.py
+- source: input/source-code/app/routers/datasets.py
+  dest: input/source-code/app/routers/datasets.py
+- source: input/source-code/app/routers/__init__.py
+  dest: input/source-code/app/routers/__init__.py
+- source: input/source-code/app/routers/experiments.py
+  dest: input/source-code/app/routers/experiments.py
+- source: input/source-code/app/utils/audit.py
+  dest: input/source-code/app/utils/audit.py
+- source: input/source-code/app/utils/__init__.py
+  dest: input/source-code/app/utils/__init__.py
+- source: input/source-code/app/utils/response.py
+  dest: input/source-code/app/utils/response.py
+- source: input/source-code/app/utils/crypto.py
+  dest: input/source-code/app/utils/crypto.py
+- source: input/source-code/app/utils/pagination.py
+  dest: input/source-code/app/utils/pagination.py
+- source: input/source-code/app/models/dataset_item.py
+  dest: input/source-code/app/models/dataset_item.py
+- source: input/source-code/app/models/__init__.py
+  dest: input/source-code/app/models/__init__.py
+- source: input/source-code/app/models/model.py
+  dest: input/source-code/app/models/model.py
+- source: input/source-code/app/models/dataset.py
+  dest: input/source-code/app/models/dataset.py
+- source: input/source-code/app/models/experiment.py
+  dest: input/source-code/app/models/experiment.py
+- source: input/source-code/app/models/experiment_result.py
+  dest: input/source-code/app/models/experiment_result.py
+- source: input/source-code/app/models/audit_log.py
+  dest: input/source-code/app/models/audit_log.py
+- source: input/source-code/app/schemas/__init__.py
+  dest: input/source-code/app/schemas/__init__.py
+- source: input/source-code/app/schemas/model.py
+  dest: input/source-code/app/schemas/model.py
+- source: input/source-code/app/schemas/dataset.py
+  dest: input/source-code/app/schemas/dataset.py
+- source: input/source-code/app/schemas/experiment.py
+  dest: input/source-code/app/schemas/experiment.py
+- source: input/source-code/app/engine/__init__.py
+  dest: input/source-code/app/engine/__init__.py
+- source: input/source-code/app/engine/evaluation_engine.py
+  dest: input/source-code/app/engine/evaluation_engine.py
+- source: input/source-code/app/services/experiment_service.py
+  dest: input/source-code/app/services/experiment_service.py
+- source: input/source-code/app/services/__init__.py
+  dest: input/source-code/app/services/__init__.py
+- source: input/source-code/app/services/model_service.py
+  dest: input/source-code/app/services/model_service.py
+- source: input/source-code/app/services/dataset_service.py
+  dest: input/source-code/app/services/dataset_service.py
+- source: input/source-code/frontend/tsconfig.node.json
+  dest: input/source-code/frontend/tsconfig.node.json
+- source: input/source-code/frontend/index.html
+  dest: input/source-code/frontend/index.html
+- source: input/source-code/frontend/package.json
+  dest: input/source-code/frontend/package.json
+- source: input/source-code/frontend/tsconfig.json
+  dest: input/source-code/frontend/tsconfig.json
+- source: input/source-code/frontend/vite.config.ts
+  dest: input/source-code/frontend/vite.config.ts
+- source: input/source-code/frontend/src/App.tsx
+  dest: input/source-code/frontend/src/App.tsx
+- source: input/source-code/frontend/src/main.tsx
+  dest: input/source-code/frontend/src/main.tsx
+- source: input/source-code/frontend/src/index.css
+  dest: input/source-code/frontend/src/index.css
+- source: input/source-code/frontend/src/api/index.ts
+  dest: input/source-code/frontend/src/api/index.ts
+- source: input/source-code/frontend/src/pages/DatasetsPage.tsx
+  dest: input/source-code/frontend/src/pages/DatasetsPage.tsx
+- source: input/source-code/frontend/src/pages/ExperimentsPage.tsx
+  dest: input/source-code/frontend/src/pages/ExperimentsPage.tsx
+- source: input/source-code/frontend/src/pages/ModelsPage.tsx
+  dest: input/source-code/frontend/src/pages/ModelsPage.tsx
+- source: input/source-code/frontend/src/pages/ExperimentDetailPage.tsx
+  dest: input/source-code/frontend/src/pages/ExperimentDetailPage.tsx
+- source: skills/guide-review-server/SKILL.md
+  dest: skills/guide-review-server/SKILL.md
+- source: skills/guide-review-server/scripts/get_guide_review_server_path.sh
+  dest: skills/guide-review-server/scripts/get_guide_review_server_path.sh
+- source: skills/pitfall-guide-server/SKILL.md
+  dest: skills/pitfall-guide-server/SKILL.md
+- source: skills/pitfall-guide-server/scripts/get_pitfall_guide_server_path.sh
+  dest: skills/pitfall-guide-server/scripts/get_pitfall_guide_server_path.sh
+- source: skills/dev-process-guide/SKILL.md
+  dest: skills/dev-process-guide/SKILL.md
+- source: skills/dev-process-guide/references/requirement-and-design.md
+  dest: skills/dev-process-guide/references/requirement-and-design.md
+- source: skills/dev-process-guide/references/coding-standards.md
+  dest: skills/dev-process-guide/references/coding-standards.md
+- source: skills/dev-process-guide/references/delivery.md
+  dest: skills/dev-process-guide/references/delivery.md
+- source: skills/dev-process-guide/references/code-review.md
+  dest: skills/dev-process-guide/references/code-review.md
+- source: skills/dev-process-guide/references/self-testing.md
+  dest: skills/dev-process-guide/references/self-testing.md
+- source: skills/dev-process-guide/references/unit-testing.md
+  dest: skills/dev-process-guide/references/unit-testing.md
+solution_files:
+- source: solution/rubrics.md
+  dest: solution/rubrics.md
+rubric_file_paths:
+- /workspace/input/output/test-report.md
+rubrics:
+- id: '01'
+  content: 【模型管理单测覆盖度 + Bug发现】在 <file>/workspace/input/output/test-report.md</file> 中，模型管理相关测试（test_model_service）必须满足：(A) 覆盖以下全部场景，且每个场景在报告中有对应的测试用例名称记录：(1) 创建模型-正常输入；(2) 创建模型-名称重复抛出异常；(3) 查询模型-ID存在返回信息；(4) 查询模型-ID不存在抛出异常；(5) 更新模型-正常更新；(6) 删除模型-无关联实验成功删除；(7) 删除模型-有进行中实验抛出异常；(8) 列表查询-分页；(9) 列表查询-筛选。测试用例命名须遵循'方法名_场景_预期结果'格式。(B) 报告中须包含'源码 Bug 修复'相关记录，明确说明发现并修复了 delete_model 方法中的逻辑错误：该方法原本检查 ExperimentStatus.COMPLETED 状态而非 ExperimentStatus.RUNNING，导致有进行中实验时仍可删除模型，已将判断条件修正为 RUNNING。判定为'不通过'的情况：报告中模型管理测试用例数少于 8 个；缺少上述任一场景的对应用例名称；用例命名不符合'方法名_场景_预期结果'格式；报告中未记录发现并修复了 delete_model 的 RUNNING/COMPLETED 状态判断错误。
+  weight: 1
+- id: '02'
+  content: 【评测集管理单测覆盖度 + Bug发现】在 <file>/workspace/input/output/test-report.md</file> 中，评测集管理相关测试（test_dataset_service）必须满足：(A) 覆盖以下全部场景，且每个场景在报告中有对应的测试用例名称记录：(1) 创建评测集-正常；(2) 创建评测集-名称重复抛出异常；(3) JSON导入-正常文件数据入库并验证记录数；(4) JSON导入-JSON格式错误返回错误信息；(5) JSON导入-缺少input字段返回含行号的错误信息；(6) JSON导入-文件超过50MB返回文件过大错误；(7) 追加导入-验证序号连续性（断言追加后所有条目seq连续且无重复）；(8) 删除评测集-有关联进行中实验禁止删除。(B) 报告中须包含'源码 Bug 修复'相关记录，明确说明发现并修复了 import_dataset_items 方法中的追加导入序号错误：追加模式下 start_seq 被赋值为 max_seq 而非 max_seq + 1，导致新导入数据的序号与已有数据重复，已将其修正为 max_seq + 1。判定为'不通过'的情况：报告中评测集管理测试用例数少于 8 个；缺少上述任一场景的对应用例名称；报告中未说明追加导入测试断言了seq的连续性和唯一性；报告中未说明缺少input字段的测试验证了错误信息包含行号；报告中未记录发现并修复了追加导入的 start_seq = max_seq 错误。
+  weight: 1
+- id: '03'
+  content: 【评测实验与执行引擎单测覆盖度 + Bug发现】在 <file>/workspace/input/output/test-report.md</file> 中，评测实验和执行引擎相关测试必须满足：(A) 覆盖以下全部场景：实验Service部分：(1) 发起实验-正常（模型和评测集均存在）；(2) 发起实验-模型不存在抛出异常；(3) 发起实验-评测集不存在抛出异常；(4) 取消实验-执行中状态取消成功；(5) 取消实验-非执行中状态抛出异常；(6) 查询实验详情-验证统计数据正确性。执行引擎部分：(7) 正常执行-所有数据成功并验证统计数据（含平均响应时间计算正确性）；(8) 模型端点超时-该条标记为失败；(9) 模型端点返回HTTP错误-错误信息被记录；(10) 并发控制-并发数不超过配置值；(11) p99响应时间-断言p99等于已知数据集中正确的百分位值（如5条数据[100,200,300,400,500]ms时断言p99==500）。报告中须说明执行引擎测试使用了Mock模拟HTTP调用。(B) 报告中须包含'源码 Bug 修复'相关记录，明确说明发现并修复了 _finalize 方法中的 p99 百分位数计算错误：原代码使用 sorted_times[int(n * 0.99) - 1]，在小数据集（如 n=5）下 int(5 * 0.99) - 1 = -1，会取到列表最后一个元素而非正确的 p99 值，已修正为加边界保护（如 max(0, int(n * 0.99) - 1) 或等效写法）。判定为'不通过'的情况：实验Service测试用例少于5个；执行引擎测试用例少于4个；报告中未提及p99断言的具体预期值；报告中未说明HTTP调用使用了Mock；报告中未记录发现并修复了 p99 的索引计算错误。
+  weight: 1
+- id: '04'
+  content: 【测试执行结果】<file>/workspace/input/output/test-report.md</file> 中必须包含以下内容：(1) 给出了执行测试的具体命令（如 pytest 命令行）；(2) 展示了测试执行的实际输出摘要，包含测试总数、通过数、失败数；(3) 测试总数不少于 100 个；(4) 失败数为 0（所有测试全部通过）；(5) 报告中列出了各测试文件及其用例数，覆盖模型管理、评测集管理、评测实验、执行引擎、工具类至少5个模块；(6) 报告中说明了至少5个边界条件测试（如空值输入、空集合、极值、文件超限等）；(7) 报告中说明了测试隔离机制（如每个测试使用独立的数据库session或事务回滚）。判定为'不通过'的情况：报告中无测试执行命令；报告中无测试总数/通过数/失败数；测试总数少于100个；失败数不为0；覆盖模块少于5个；未说明边界条件测试；未说明测试隔离机制。
+  weight: 1
+---
+
+## Prompt
+
+请根据 `/workspace/input/PRD.md` 中的评测平台产品需求文档和 `/workspace/input/technical-design.md` 中的技术方案，以及 `/workspace/input/source-code/` 中的项目源代码，按照研发规范，为核心业务逻辑编写单元测试。
+
+### 任务要求
+
+为核心业务逻辑编写单元测试：
+1. 模型管理 Service 层单测：覆盖创建（正常/重名）、查询（存在/不存在）、更新、删除（正常/有关联实验）场景
+2. 评测集管理 Service 层单测：覆盖创建、JSON 导入（正常/格式错误/超大文件）、删除（正常/有关联实验）场景
+3. 评测实验 Service 层单测：覆盖发起实验（正常/模型不存在/评测集不存在）、取消实验（执行中/非执行中）场景
+4. 评测执行引擎单测：覆盖正常执行、模型端点超时、模型端点返回错误、并发控制场景
+5. 工具类单测：JSON 校验、数据格式转换等
+
+单测需遵循 AAA 模式，命名遵循 `方法名_场景_预期结果` 格式，确保新增代码增量覆盖率 ≥ 80%。
+
+**关键要求**：编写完成后，必须真实执行所有单元测试（如 `pytest`、`npm test`、`go test ./...`、`mvn test` 等），确保全部通过。将测试执行的命令和输出结果（通过数、失败数、覆盖率）一并展示。如有失败用例，必须修复代码直到全部通过。
+
+将测试代码输出到 `/workspace/input/output/tests` 目录中，并在 `/workspace/input/output/test-report.md` 中记录测试执行结果。
+
+### 环境信息
+
+- 系统 Python 版本为 3.10.19
+
+### 总体要求
+
+- 请直接完成所有任务，不要问我任何问题，也不要让我做出进一步决策
+- 如果遇到任何问题和决策点，请自行判断并给出合理方案
+- 单元测试必须真实执行，不允许纸面推演或模拟执行
+- 如果单测发现源代码问题，需修复源代码并记录修复内容，输出在`/workspace/input/output/test-report.md`报告里。
+
+## Grading Criteria
+
+- [ ] [01] 【模型管理单测覆盖度 + Bug发现】在 <file>/workspace/input/output/test-report.md</file> 中，模型管理相关测试（test_model_service）必须满足：(A) 覆盖以下全部场景，且每个场景在报告中有对应的测试用例名称记录：(1) 创建模型-正常输入；(2) 创建模型-名称重复抛出异常；(3) 查询模型-ID存在返回信息；(4) 查询模型-ID不存在抛出异常；(5) 更新模型-正常更新；(6) 删除模型-无关联实验成功删除；(7) 删除模型-有进行中实验抛出异常；(8) 列表查询-分页；(9) 列表查询-筛选。测试用例命名须遵循'方法名_场景_预期结果'格式。(B) 报告中须包含'源码 Bug 修复'相关记录，明确说明发现并修复了 delete_model 方法中的逻辑错误：该方法原本检查 ExperimentStatus.COMPLETED 状态而非 ExperimentStatus.RUNNING，导致有进行中实验时仍可删除模型，已将判断条件修正为 RUNNING。判定为'不通过'的情况：报告中模型管理测试用例数少于 8 个；缺少上述任一场景的对应用例名称；用例命名不符合'方法名_场景_预期结果'格式；报告中未记录发现并修复了 delete_model 的 RUNNING/COMPLETED 状态判断错误。
+- [ ] [02] 【评测集管理单测覆盖度 + Bug发现】在 <file>/workspace/input/output/test-report.md</file> 中，评测集管理相关测试（test_dataset_service）必须满足：(A) 覆盖以下全部场景，且每个场景在报告中有对应的测试用例名称记录：(1) 创建评测集-正常；(2) 创建评测集-名称重复抛出异常；(3) JSON导入-正常文件数据入库并验证记录数；(4) JSON导入-JSON格式错误返回错误信息；(5) JSON导入-缺少input字段返回含行号的错误信息；(6) JSON导入-文件超过50MB返回文件过大错误；(7) 追加导入-验证序号连续性（断言追加后所有条目seq连续且无重复）；(8) 删除评测集-有关联进行中实验禁止删除。(B) 报告中须包含'源码 Bug 修复'相关记录，明确说明发现并修复了 import_dataset_items 方法中的追加导入序号错误：追加模式下 start_seq 被赋值为 max_seq 而非 max_seq + 1，导致新导入数据的序号与已有数据重复，已将其修正为 max_seq + 1。判定为'不通过'的情况：报告中评测集管理测试用例数少于 8 个；缺少上述任一场景的对应用例名称；报告中未说明追加导入测试断言了seq的连续性和唯一性；报告中未说明缺少input字段的测试验证了错误信息包含行号；报告中未记录发现并修复了追加导入的 start_seq = max_seq 错误。
+- [ ] [03] 【评测实验与执行引擎单测覆盖度 + Bug发现】在 <file>/workspace/input/output/test-report.md</file> 中，评测实验和执行引擎相关测试必须满足：(A) 覆盖以下全部场景：实验Service部分：(1) 发起实验-正常（模型和评测集均存在）；(2) 发起实验-模型不存在抛出异常；(3) 发起实验-评测集不存在抛出异常；(4) 取消实验-执行中状态取消成功；(5) 取消实验-非执行中状态抛出异常；(6) 查询实验详情-验证统计数据正确性。执行引擎部分：(7) 正常执行-所有数据成功并验证统计数据（含平均响应时间计算正确性）；(8) 模型端点超时-该条标记为失败；(9) 模型端点返回HTTP错误-错误信息被记录；(10) 并发控制-并发数不超过配置值；(11) p99响应时间-断言p99等于已知数据集中正确的百分位值（如5条数据[100,200,300,400,500]ms时断言p99==500）。报告中须说明执行引擎测试使用了Mock模拟HTTP调用。(B) 报告中须包含'源码 Bug 修复'相关记录，明确说明发现并修复了 _finalize 方法中的 p99 百分位数计算错误：原代码使用 sorted_times[int(n * 0.99) - 1]，在小数据集（如 n=5）下 int(5 * 0.99) - 1 = -1，会取到列表最后一个元素而非正确的 p99 值，已修正为加边界保护（如 max(0, int(n * 0.99) - 1) 或等效写法）。判定为'不通过'的情况：实验Service测试用例少于5个；执行引擎测试用例少于4个；报告中未提及p99断言的具体预期值；报告中未说明HTTP调用使用了Mock；报告中未记录发现并修复了 p99 的索引计算错误。
+- [ ] [04] 【测试执行结果】<file>/workspace/input/output/test-report.md</file> 中必须包含以下内容：(1) 给出了执行测试的具体命令（如 pytest 命令行）；(2) 展示了测试执行的实际输出摘要，包含测试总数、通过数、失败数；(3) 测试总数不少于 100 个；(4) 失败数为 0（所有测试全部通过）；(5) 报告中列出了各测试文件及其用例数，覆盖模型管理、评测集管理、评测实验、执行引擎、工具类至少5个模块；(6) 报告中说明了至少5个边界条件测试（如空值输入、空集合、极值、文件超限等）；(7) 报告中说明了测试隔离机制（如每个测试使用独立的数据库session或事务回滚）。判定为'不通过'的情况：报告中无测试执行命令；报告中无测试总数/通过数/失败数；测试总数少于100个；失败数不为0；覆盖模块少于5个；未说明边界条件测试；未说明测试隔离机制。

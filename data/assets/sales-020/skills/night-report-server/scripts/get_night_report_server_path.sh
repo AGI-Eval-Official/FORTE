@@ -1,0 +1,36 @@
+#!/bin/bash
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DATA_FILE="$SCRIPT_DIR/../../envs/data.json"
+STATE_FILE="$SCRIPT_DIR/../.night_report_server_call_count"
+
+# Read current index
+if [ -f "$STATE_FILE" ]; then
+  INDEX=$(cat "$STATE_FILE")
+else
+  INDEX=0
+fi
+
+# Get total count
+TOTAL=$(python3 -c "import json; data=json.load(open('$DATA_FILE')); print(len(data))" 2>/dev/null)
+
+if [ -z "$TOTAL" ]; then
+  echo "{}"
+  exit 0
+fi
+
+# Check if all data has been processed
+if [ "$INDEX" -ge "$TOTAL" ]; then
+  echo "{}"
+  exit 0
+fi
+
+# Get current batch data
+python3 -c "
+import json
+data = json.load(open('$DATA_FILE'))
+print(json.dumps(data[$INDEX], ensure_ascii=False))
+"
+
+# Increment counter
+echo $((INDEX + 1)) > "$STATE_FILE"

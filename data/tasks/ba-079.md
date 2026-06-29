@@ -1,0 +1,132 @@
+---
+id: ba-079
+name: ba-079
+category: ba
+grading_type: llm_judge
+timeout_seconds: 2400
+input_modality: text
+workspace_files:
+- source: skills/ridehailing-business-analyst/SKILL.md
+  dest: skills/ridehailing-business-analyst/SKILL.md
+solution_files:
+- source: solution/rubrics.md
+  dest: solution/rubrics.md
+rubric_file_paths: []
+rubrics:
+- id: '01'
+  content: 答案需明确指出上海采取提价策略，在供给不足的背景下，牺牲了更多需求，并未解决核心供给瓶颈
+  weight: 1
+- id: '02'
+  content: 答案需明确指出北京采取司机补贴策略，司机补贴改进了供给侧，是更高效的应对供给侧冲击的手段
+  weight: 1
+---
+
+## Prompt
+
+你是一名专业商分分析师。请仅基于给定输入数据和业务知识完成网约车业务分析，不使用任何外部信息，也不要追问补充背景。
+
+输入数据通过以下 Datasette SQL 查询接口获取，将 SQL 语句 URL encode 后拼接到接口地址即可，返回 JSON 格式：
+
+```
+https://ba-case11-ridehailing.fly.dev/ba_case11_ridehailing?sql=<URL编码后的SQL>&_shape=array
+```
+
+数据库共包含三张表：
+
+**表1：case11_dwd_order_detail**（订单明细表，粒度：订单级）
+用途：价格分析、漏斗转化、GMV拆解、归因分析
+字段：
+- order_create_dt：订单创建时间（TEXT）
+- order_id：订单ID（TEXT）
+- city_id：城市（TEXT）；
+  - 与司机日表的 `city`、乘客日表的 `home_city` 对应，字段名不同，跨表关联时注意对齐
+- order_scene：订单场景，枚举值：通勤 / 休闲娱乐 / 差旅 / 其他（TEXT）
+- order_status：订单状态（INTEGER），枚举值含义如下：
+  - `1` = 完单（最终成交，用于 GMV、收益等分析时仅取此状态）
+  - `2` = 司机取消
+  - `3` = 乘客取消（含等待超时等情形）
+  - `4` = 冒泡但无司机应答
+- time_slot：时段（TEXT），如晚高峰、午平峰
+- user_id：用户ID（TEXT）
+- driver_id：司机ID（TEXT）；乘客取消（order_status=3）时该字段为空
+- pickup_duration_sec：接驾等待时长（秒）
+- trip_duration_sec：行程时长（秒）
+- trip_distance_m：行程距离（米）
+- order_gmv_amt：订单GMV金额（即订单总价）
+- user_discount_amt：用户优惠金额
+- driver_subsidy_amt：司机补贴金额
+- platform_commission_amt：平台抽佣金额
+- is_new_user：用户类型（INTEGER），枚举值含义如下：
+  - `1` = 新用户
+  - `2` = 老用户
+
+**表2：case11_dwd_driver_daily**（司机日维度表，粒度：司机×日）
+用途：供给侧分析、IPH、人效分析
+字段：
+- dt：日期（TEXT）
+- driver_id：司机ID（TEXT）
+- city：城市（TEXT）；与订单表的 `city_id` 对应，字段名不同
+- driver_type：司机类型（INTEGER），枚举值含义如下：
+  - `1` = 全职，`2` = 兼职
+- online_duration_sec：在线时长（秒）
+- charge_duration_sec：计费时长（秒，司机实际载客行程的时长）
+- idle_duration_sec：空闲时长（秒，在线但无订单的等待时长）
+- position_duration_sec：就位时长（秒，空驶去接客的时长）
+- total_mileage_m：总里程（米）
+- position_distance_m：定位里程（米）
+- charge_distance_m：计费里程（米，载客里程）
+- complete_order_cnt：完成订单数
+- accept_order_cnt：接单数
+- driver_cancel_cnt：司机取消数
+- passenger_cancel_cnt：乘客取消数
+- driver_income_amt：司机行程收入（不含补贴）
+- driver_subsidy_amt：司机补贴金额
+- driver_lifecycle_stage：司机生命周期阶段（TEXT），枚举值：`新司机` / `老司机` 等
+- active_drivers：当日活跃司机数（城市级日度快照，同城市同日取第一条即可）
+
+**表3：case11_dwd_passenger_daily**（乘客日维度表，粒度：乘客×日）
+用途：需求侧分析、漏斗转化（冒泡/提单/成单）
+字段：
+- dt：日期（TEXT）
+- user_id：用户ID（TEXT）
+- home_city：归属城市（TEXT）；与订单表的 `city_id` 对应，字段名不同
+- price_sensitivity_level：价格敏感度（TEXT），枚举值：`low` / `medium` / `high` 
+- time_sensitivity_level：时间敏感度（TEXT），枚举值：`low` / `medium` / `high` 
+- user_lifecycle_stage：用户生命周期阶段（TEXT），枚举值：`新用户` / `老用户` 等
+- bubble_cnt：冒泡次数（用户触发平台报价展示的次数）
+- submit_cnt：提单次数（用户确认下单的次数）
+- complete_cnt：成单次数
+- cancel_cnt：取消次数（对应 order_status=2 和 order_status=3 的订单数之和）
+
+---
+
+**关键指标计算口径说明：**
+
+收益类指标（仅使用 order_status=1 的完单记录）：
+- GMV = order_gmv_amt 求和
+- 用户实付 = (order_gmv_amt - user_discount_amt) 求和
+- 平台净收入 = (platform_commission_amt - driver_subsidy_amt) 求和
+- 司机收入 = (order_gmv_amt - user_discount_amt - platform_commission_amt + driver_subsidy_amt) 求和
+
+效率类指标（来自司机日表）：
+- IPH（时均收入）= (driver_income_amt + driver_subsidy_amt) 求和 / (online_duration_sec 求和 / 3600)
+- 时间利用率 = charge_duration_sec 求和 / online_duration_sec 求和
+
+转化类指标（来自乘客日表）：
+- 冒泡→提单转化率 = submit_cnt 求和 / bubble_cnt 求和
+- 提单→成单转化率 = complete_cnt 求和 / submit_cnt 求和
+- 总转化率 = complete_cnt 求和 / bubble_cnt 求和
+- 价格流失率 = 1- 冒泡→提单转化率
+---
+
+数据库在线浏览地址：https://ba-case11-ridehailing.fly.dev/
+
+任务要求：
+基于三张表数据，综合比较上海和北京在day 12-22的运营策略差异和业务表现，分析业务表现出现差异的原因？
+
+注意，请直接回复答案，不要问我任何问题，也不要让我做出进一步决策。如果遇到任何问题和决策点，请你自行解决。请直接回复，不要生成任何文件。
+
+## Grading Criteria
+
+- [ ] [01] 答案需明确指出上海采取提价策略，在供给不足的背景下，牺牲了更多需求，并未解决核心供给瓶颈
+- [ ] [02] 答案需明确指出北京采取司机补贴策略，司机补贴改进了供给侧，是更高效的应对供给侧冲击的手段

@@ -1,0 +1,101 @@
+---
+id: hr-001
+name: hr-001
+category: hr
+grading_type: llm_judge
+timeout_seconds: 2400
+input_modality: text
+workspace_files:
+- source: input/李雨桐简历.pdf
+  dest: input/李雨桐简历.pdf
+- source: input/外卖商户BD岗位JD.docx
+  dest: input/外卖商户BD岗位JD.docx
+- source: input/赵晨曦简历.pdf
+  dest: input/赵晨曦简历.pdf
+- source: input/周伦简历.pdf
+  dest: input/周伦简历.pdf
+- source: input/王琳达简历.pdf
+  dest: input/王琳达简历.pdf
+- source: input/孙博文简历.pdf
+  dest: input/孙博文简历.pdf
+- source: input/文本评测岗位JD.docx
+  dest: input/文本评测岗位JD.docx
+- source: skills/resume-screener/SKILL.md
+  dest: skills/resume-screener/SKILL.md
+- source: skills/hr-variance-analyst/SKILL.md
+  dest: skills/hr-variance-analyst/SKILL.md
+- source: skills/anniversary-blessing/SKILL.md
+  dest: skills/anniversary-blessing/SKILL.md
+- source: skills/performance-evaluation/SKILL.md
+  dest: skills/performance-evaluation/SKILL.md
+- source: skills/performance-evaluation/references/ksf.md
+  dest: skills/performance-evaluation/references/ksf.md
+- source: skills/performance-evaluation/references/360-degree.md
+  dest: skills/performance-evaluation/references/360-degree.md
+- source: skills/performance-evaluation/references/kpi.md
+  dest: skills/performance-evaluation/references/kpi.md
+- source: skills/performance-evaluation/references/bsc.md
+  dest: skills/performance-evaluation/references/bsc.md
+- source: skills/performance-evaluation/references/mbo.md
+  dest: skills/performance-evaluation/references/mbo.md
+- source: skills/performance-evaluation/references/okr.md
+  dest: skills/performance-evaluation/references/okr.md
+- source: skills/training-plan-generator/SKILL.md
+  dest: skills/training-plan-generator/SKILL.md
+solution_files:
+- source: solution/rubrics.md
+  dest: solution/rubrics.md
+rubric_file_paths:
+- /workspace/input/answer/外卖商户BD简历筛选.txt
+- /workspace/input/answer/文本评测简历筛选.txt
+rubrics:
+- id: '01'
+  content: <file>/workspace/input/answer/文本评测简历筛选.txt</file>以及<file>/workspace/input/answer/外卖商户BD简历筛选.txt</file>均需包含周伦、孙博文、李雨桐、王琳达、赵晨曦5名候选人的简历筛选结果
+  weight: 1
+- id: '02'
+  content: <file>/workspace/input/answer/文本评测简历筛选.txt</file>以及<file>/workspace/input/answer/外卖商户BD简历筛选.txt</file>第一句话均为：'通过xx人，不通过xx人'，且通过和不通过的人数之和均为5
+  weight: 1
+- id: '03'
+  content: <file>/workspace/input/answer/文本评测简历筛选.txt</file>和<file>/workspace/input/answer/外卖商户BD简历筛选.txt</file>中，每位候选人的【简历筛选结论】字段，仅能填写'通过'或'不通过'
+  weight: 1
+- id: '04'
+  content: <file>/workspace/input/answer/外卖商户BD简历筛选.txt</file>和<file>/workspace/input/answer/文本评测简历筛选.txt</file>中，在各自文件内筛选结论为不通过的候选人，每位候选人以姓名为标题，其下简历筛选内容包含且仅包含【简历筛选结论】、【JD 匹配条目】、【亮点证据】、【风险与疑点】这4个字段，字段名称保持一致。如缺失前述4个必要字段中任意一个，或改动了字段名称，或生成了其他字段，均视为不通过
+  weight: 1
+- id: '05'
+  content: <file>/workspace/input/answer/外卖商户BD简历筛选.txt</file>和<file>/workspace/input/answer/文本评测简历筛选.txt</file>中，在各自文件内筛选结论为通过的候选人，每位候选人以姓名为标题，其下简历筛选内容需包含且仅包含【简历筛选结论】、【JD 匹配条目】、【亮点证据】、【风险与疑点】、【追问清单】、【建议面试轮次/侧重点】这6个字段，字段名称保持一致。如缺失前述6个必要字段中任意一个，或改动了字段名称，或生成了其他字段，均视为不通过
+  weight: 1
+- id: '06'
+  content: <file>/workspace/input/answer/外卖商户BD简历筛选.txt</file>中，王琳达的筛选结论为不通过，且【风险与疑点】字段中明确指出其学历（高中）不满足岗位要求（大专及以上）
+  weight: 1
+- id: '07'
+  content: <file>/workspace/input/answer/文本评测简历筛选.txt</file>中，孙博文的筛选结论为不通过，且【风险与疑点】字段中明确指出其AI相关工作经验（8个月）不满足岗位必要项要求（1年以上）
+  weight: 1
+---
+
+## Prompt
+
+`/workspace/input/`中包含两个岗位JD文件，以及5份候选人简历，请针对每份JD，分别筛选全部候选人简历，判断每位候选人是否匹配这两个岗位。
+
+输出两份筛选结果：
+
+```
+/workspace/input/answer/外卖商户BD简历筛选.txt
+/workspace/input/answer/文本评测简历筛选.txt
+```
+两份筛选结果都需要在第一句话给出整体总结“通过xx人，不通过xx人”
+
+每位候选人以其姓名作为标题，输出字段包括：`【简历筛选结论】`、`【JD 匹配条目】`、`【亮点证据】`、`【风险与疑点】`，若筛选结论为通过则额外追加 `【追问清单】`、`【建议面试轮次/侧重点】`，不得生成任何其他字段或额外信息。
+
+每位候选人的 `【简历筛选结论】` 字段只允许填写“通过”或“不通过”。
+
+请直接执行操作，不要问我任何问题，也不要让我做出进一步决策。如果遇到任何问题和决策点，请你自行解决。
+
+## Grading Criteria
+
+- [ ] [01] <file>/workspace/input/answer/文本评测简历筛选.txt</file>以及<file>/workspace/input/answer/外卖商户BD简历筛选.txt</file>均需包含周伦、孙博文、李雨桐、王琳达、赵晨曦5名候选人的简历筛选结果
+- [ ] [02] <file>/workspace/input/answer/文本评测简历筛选.txt</file>以及<file>/workspace/input/answer/外卖商户BD简历筛选.txt</file>第一句话均为：'通过xx人，不通过xx人'，且通过和不通过的人数之和均为5
+- [ ] [03] <file>/workspace/input/answer/文本评测简历筛选.txt</file>和<file>/workspace/input/answer/外卖商户BD简历筛选.txt</file>中，每位候选人的【简历筛选结论】字段，仅能填写'通过'或'不通过'
+- [ ] [04] <file>/workspace/input/answer/外卖商户BD简历筛选.txt</file>和<file>/workspace/input/answer/文本评测简历筛选.txt</file>中，在各自文件内筛选结论为不通过的候选人，每位候选人以姓名为标题，其下简历筛选内容包含且仅包含【简历筛选结论】、【JD 匹配条目】、【亮点证据】、【风险与疑点】这4个字段，字段名称保持一致。如缺失前述4个必要字段中任意一个，或改动了字段名称，或生成了其他字段，均视为不通过
+- [ ] [05] <file>/workspace/input/answer/外卖商户BD简历筛选.txt</file>和<file>/workspace/input/answer/文本评测简历筛选.txt</file>中，在各自文件内筛选结论为通过的候选人，每位候选人以姓名为标题，其下简历筛选内容需包含且仅包含【简历筛选结论】、【JD 匹配条目】、【亮点证据】、【风险与疑点】、【追问清单】、【建议面试轮次/侧重点】这6个字段，字段名称保持一致。如缺失前述6个必要字段中任意一个，或改动了字段名称，或生成了其他字段，均视为不通过
+- [ ] [06] <file>/workspace/input/answer/外卖商户BD简历筛选.txt</file>中，王琳达的筛选结论为不通过，且【风险与疑点】字段中明确指出其学历（高中）不满足岗位要求（大专及以上）
+- [ ] [07] <file>/workspace/input/answer/文本评测简历筛选.txt</file>中，孙博文的筛选结论为不通过，且【风险与疑点】字段中明确指出其AI相关工作经验（8个月）不满足岗位必要项要求（1年以上）

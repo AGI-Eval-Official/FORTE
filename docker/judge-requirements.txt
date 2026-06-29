@@ -1,0 +1,6 @@
+json_repair==0.44.1
+olefile==0.47
+openpyxl==3.1.5
+pillow==10.4.0
+pypdf==6.9.2
+requests==2.32.5
