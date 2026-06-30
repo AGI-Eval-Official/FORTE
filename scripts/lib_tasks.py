@@ -149,6 +149,7 @@ class Task:
         grading_weights: Optional[Dict[str, float]] = None,
         file_path: Optional[Path] = None,
         frontmatter: Optional[Dict[str, Any]] = None,
+        min_wait_seconds: int = 0,
     ):
         self.task_id = task_id
         self.name = name
@@ -156,6 +157,7 @@ class Task:
         self.grading_type = grading_type
         self.timeout_seconds = timeout_seconds
         self.workspace_files = workspace_files
+        self.min_wait_seconds = min_wait_seconds
         self.prompt = prompt
         self.expected_behavior = expected_behavior
         self.grading_criteria = grading_criteria
@@ -176,6 +178,7 @@ class Task:
             'grading_type': self.grading_type,
             'timeout_seconds': self.timeout_seconds,
             'workspace_files': self.workspace_files,
+            'min_wait_seconds': self.min_wait_seconds,
             'prompt': self.prompt,
             'expected_behavior': self.expected_behavior,
             'grading_criteria': self.grading_criteria,
@@ -242,6 +245,7 @@ class TaskLoader:
             grading_type=metadata.get('grading_type', 'automated'),
             timeout_seconds=metadata.get('timeout_seconds', 120),
             workspace_files=metadata.get('workspace_files', []),
+            min_wait_seconds=metadata.get('min_wait_seconds', 0) or 0,
             prompt=sections.get('Prompt', '').strip(),
             expected_behavior=sections.get('Expected Behavior', '').strip(),
             grading_criteria=grading_criteria,

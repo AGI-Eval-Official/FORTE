@@ -4,6 +4,7 @@ name: Misc-AT-003
 category: Misc
 grading_type: llm_judge
 timeout_seconds: 2400
+min_wait_seconds: 420
 input_modality: text
 workspace_files:
 - source: skills/brief-server/SKILL.md

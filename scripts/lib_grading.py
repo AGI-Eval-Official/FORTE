@@ -453,12 +453,27 @@ def run_incontainer_judge(container, task: Task, transcript, verbose: bool = Fal
 
 
 def _extract_model_response_from_messages(transcript: List[Dict[str, Any]]) -> str:
-    """Extract the agent's final text response from the run transcript."""
-    from judge import extract_model_response
-
+    """Extract the agent's final text response from the run transcript.
+    
+    """
     messages = _openclaw_transcript_to_messages(transcript or [])
     try:
-        return extract_model_response(messages)
+        parts: List[str] = []
+        for msg in messages:
+            if msg.get("role") == "assistant" and "content" in msg:
+                content = msg["content"]
+                if content is None:
+                    continue
+                if not isinstance(content, str):
+                    raise AssertionError("non-string assistant content")
+                content = content.split("</think>")[-1].split("</longcat_think>")[-1].strip()
+                if content:
+                    parts.append(content)
+            if msg.get("role") == "user" and "content" in msg:
+                uc = msg["content"]
+                if isinstance(uc, str) and "Read HEARTBEAT.md" in uc:
+                    break
+        return "\n".join(parts)
     except AssertionError:
         # Defensive: a non-string content slipped through; fall back to empty.
         logger.warning("extract_model_response assertion failed; using empty response")

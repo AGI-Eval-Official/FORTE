@@ -549,6 +549,13 @@ def execute_task_in_docker(
                 break
             prompt_error_retries = attempt
 
+        if not timed_out and getattr(task, "min_wait_seconds", 0) > 0:
+            logger.info(
+                "🐳 [%s] agent exited; sleeping %ds for async side effects before snapshot",
+                container_name, task.min_wait_seconds,
+            )
+            time.sleep(task.min_wait_seconds)
+
         # Snapshot the agent's working tree (= the input root) to a local temp
         # dir for grading. The snapshot ROOT thus equals the rubric's
         # /workspace/input virtual root (see lib_grading path_map).
