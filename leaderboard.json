@@ -1,4 +1,5 @@
 [
+  {"model": "LongCat 2.0",          "avg_at_3": "0.7322", "pass_at_3": "0.8470", "pass_pow_3": "0.5902"},
   {"model": "GLM 5.2",              "avg_at_3": "0.7687", "pass_at_3": "0.8525", "pass_pow_3": "0.6393"},
   {"model": "GLM 5.1",              "avg_at_3": "0.7377", "pass_at_3": "0.8525", "pass_pow_3": "0.6120"},
   {"model": "DeepSeek V4 pro",      "avg_at_3": "0.7049", "pass_at_3": "0.8306", "pass_pow_3": "0.5464"},
