@@ -260,10 +260,13 @@ python scripts/aggregate.py --json                    # 输出机器可读 JSON
 - 高信 — `gaoxin60@meituan.com`
 - 安晟男 — `anshengnan@meituan.com`
 - 曹雪智 - `caoxuezhi@meituan.com`
+- 丛熙平 - `congxiping@meituan.com`
+- 郭林森 - `guolinsen@meituan.com`
 - 刘佳兴 - `liujiaxing10@meituan.com`
 - 李啸宇 - `lixiaoyu28@meituan.com`
 - 李志峰 - `lizhifeng05@meituan.com`
 - 王姿雯 - `wangziwen03@meituan.com`
 - 魏玉槐 - `weiyuhuai@meituan.com`
 - 张梓键 - `zhangzijian14@meituan.com`
+- 赵云柯 - `zhaoyunke@meituan.com`
 - 朱明阳 - `zhumingyang09@meituan.com`
