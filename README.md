@@ -269,11 +269,14 @@ For questions and support, please open an issue on GitHub or contact the maintai
 
 - Xin Gao — `gaoxin60@meituan.com`
 - Jiaxing Liu - `liujiaxing10@meituan.com`
+- Linsen Guo - `guolinsen@meituan.com`
 - Mingyang Zhu - `zhumingyang09@meituan.com`
 - Shengnan An — `anshengnan@meituan.com`
 - Xiaoyu Li - `lixiaoyu28@meituan.com`
+- Xiping Cong - `congxiping@meituan.com`
 - Xuezhi Cao - `caoxuezhi@meituan.com`
 - Yuhuai Wei - `weiyuhuai@meituan.com`
+- Yunke Zhao - `zhaoyunke@meituan.com`
 - Zhifeng Li - `lizhifeng05@meituan.com`
 - Zijian Zhang - `zhangzijian14@meituan.com`
 - Ziwen Wang - `wangziwen03@meituan.com`
